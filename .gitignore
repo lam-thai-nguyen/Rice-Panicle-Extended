@@ -1,0 +1,10 @@
+.vscode/
+checkpoints/
+data/
+notebooks/
+scripts/preprocess_data.py
+scripts/visualize_results.py
+scripts/generate_annotations/__pycache__/
+src/
+requirements.txt
+README.md
