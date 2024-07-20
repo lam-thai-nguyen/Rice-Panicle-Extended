@@ -22,30 +22,24 @@ class AnnotationsGenerator:
         self.img = cv2.imread(img_path)
         self.ricepr_path = ricepr_path
         self.ricepr_manager = riceprManager(PATH=ricepr_path)
+        self.name = self.ricepr_manager.name
+        self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
     
     def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
-        if remove_end_generating:
+        if remove_end_generating and len(self.junctions.return_generating()) == 2:
             self.junctions.remove_end_generating()
-            assert len(self.junctions.return_generating()) == 1, "Incorrect number of generating junctions"
         
         generating = self.junctions.return_generating()
         primary = self.junctions.return_primary()
         secondary = self.junctions.return_secondary()
         tertiary = self.junctions.return_tertiary()
         quaternary = self.junctions.return_quaternary()
+        junctions = generating + primary + secondary + tertiary + quaternary
         
         img_copy = self.img.copy()
         
-        for x, y in generating:
-            cv2.rectangle(img_copy, pt1=(x - 10, y - 10), pt2=(x + 10, y + 10), color=(0, 255, 255), thickness=2)
-        for x, y in primary:
-            cv2.rectangle(img_copy, pt1=(x - 10, y - 10), pt2=(x + 10, y + 10), color=(0, 255, 255), thickness=2)
-        for x, y in secondary:
-            cv2.rectangle(img_copy, pt1=(x - 10, y - 10), pt2=(x + 10, y + 10), color=(0, 255, 255), thickness=2)
-        for x, y in tertiary:
-            cv2.rectangle(img_copy, pt1=(x - 10, y - 10), pt2=(x + 10, y + 10), color=(0, 255, 255), thickness=2)
-        for x, y in quaternary:
+        for x, y in junctions:
             cv2.rectangle(img_copy, pt1=(x - 10, y - 10), pt2=(x + 10, y + 10), color=(0, 255, 255), thickness=2)
             
         if show:
@@ -54,9 +48,25 @@ class AnnotationsGenerator:
         if save_path:
             cv2.imwrite(save_path, img_copy)
             
-    def encode_junctions(self):
-        pass
-    
+    def encode_junctions(self, save=False, remove_end_generating=False):
+        """
+        Encode the junction bounding boxes as (class_label, x, y, w, h), all relative to the whole image
+        """
+        if remove_end_generating and len(self.junctions.return_generating()) == 2:
+            self.junctions.remove_end_generating()
+
+        generating = self.junctions.return_generating()
+        primary = self.junctions.return_primary()
+        secondary = self.junctions.return_secondary()
+        tertiary = self.junctions.return_tertiary()
+        quaternary = self.junctions.return_quaternary()
+        
+        junctions = generating + primary + secondary + tertiary + quaternary
+        
+        if save:
+            print(f"==>> Saving {self.name}.txt")
+            self._encode_box(junctions)
+            
     def draw_grains(self, save_path=None, show=False):
         img_copy = self.img.copy()
         
@@ -118,6 +128,22 @@ class AnnotationsGenerator:
         plt.tight_layout()
         plt.show()
     
+    def _encode_box(self, junctions) -> None:
+        """
+        Args:
+            save_path (str): file path
+            junctions (list): list of all junctions
+        """
+        assert self.species is not None, "Unidentified species"
+        save_path = f"data/annotations/{self.species}/{self.name}.txt"
+        height, width, _ = self.img.shape
+        
+        with open(save_path, "w") as f:
+            for x, y in junctions:
+                x, y = int(x) / width, int(y) / height
+                w, h = 20 / width, 20 / height
+                class_label = 0
+                f.write(f"{class_label} {x} {y} {w} {h}\n")
 
 def test():
     img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
@@ -126,6 +152,7 @@ def test():
     annotations_generator.draw_junctions(show=True)
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
     annotations_generator.draw_grains(show=True)
+    annotations_generator.encode_junctions(save=True, remove_end_generating=True)
     print("All tests passed")
     
 
