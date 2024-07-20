@@ -47,6 +47,8 @@ class AnnotationsGenerator:
             self._show(img_copy)
             
         if save_path:
+            save_path = save_path + "/" + self.name + "_junctions.jpg"
+            print(f"==>> Saving {save_path}")
             cv2.imwrite(save_path, img_copy)
             
     def encode_junctions(self, save_path=None, remove_end_generating=False):
@@ -112,6 +114,8 @@ class AnnotationsGenerator:
             self._show(img_copy)
             
         if save_path:
+            save_path = save_path + "/" + self.name + "_grains.jpg"
+            print(f"==>> Saving {save_path}")
             cv2.imwrite(save_path, img_copy)
     
     def encode_grains(self):
