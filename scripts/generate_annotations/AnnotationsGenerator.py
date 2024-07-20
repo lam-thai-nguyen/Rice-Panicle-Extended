@@ -1,3 +1,4 @@
+import os
 import cv2
 import matplotlib.pyplot as plt
 from .riceprManager import riceprManager
@@ -48,7 +49,7 @@ class AnnotationsGenerator:
         if save_path:
             cv2.imwrite(save_path, img_copy)
             
-    def encode_junctions(self, save=False, remove_end_generating=False):
+    def encode_junctions(self, save_path=None, remove_end_generating=False):
         """
         Encode the junction bounding boxes as (class_label, x, y, w, h), all relative to the whole image
         """
@@ -63,9 +64,10 @@ class AnnotationsGenerator:
         
         junctions = generating + primary + secondary + tertiary + quaternary
         
-        if save:
-            print(f"==>> Saving {self.name}.txt")
-            self._encode_box(junctions)
+        if save_path:
+            save_path = save_path + "/" + self.name + "_junctions.txt"
+            print(f"==>> Saving {save_path}")
+            self._encode_box(junctions, save_path)
             
     def draw_grains(self, save_path=None, show=False):
         img_copy = self.img.copy()
@@ -128,18 +130,16 @@ class AnnotationsGenerator:
         plt.tight_layout()
         plt.show()
     
-    def _encode_box(self, junctions) -> None:
+    def _encode_box(self, boxes, save_path) -> None:
         """
         Args:
+            boxes (list): list of all boxes
             save_path (str): file path
-            junctions (list): list of all junctions
         """
-        assert self.species is not None, "Unidentified species"
-        save_path = f"data/annotations/{self.species}/{self.name}.txt"
         height, width, _ = self.img.shape
         
         with open(save_path, "w") as f:
-            for x, y in junctions:
+            for x, y in boxes:
                 x, y = int(x) / width, int(y) / height
                 w, h = 20 / width, 20 / height
                 class_label = 0
@@ -149,10 +149,10 @@ def test():
     img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
     ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    annotations_generator.draw_junctions(show=True)
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
     annotations_generator.draw_grains(show=True)
-    annotations_generator.encode_junctions(save=False, remove_end_generating=True)
+    annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
+    os.remove("10_2_1_1_1_DSC01291_junctions.txt")
     print("All tests passed")
     
 
