@@ -123,7 +123,7 @@ class AnnotationsGenerator:
     
     def _show(self, img):
         plt.figure(figsize=(8, 8))
-        plt.imshow(img)
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         plt.axis("off")
         plt.tight_layout()
         plt.show()
