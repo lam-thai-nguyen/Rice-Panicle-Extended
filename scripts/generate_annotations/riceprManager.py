@@ -16,6 +16,7 @@ class riceprManager:
         assert PATH.split("/")[-1].split(".")[-1].lower() == "ricepr", "The given path is not a .ricepr file"
         self.PATH = PATH
         self.name = self.PATH.split("/")[-1].split(".")[0]
+        self.species = "Asian" if "Asian" in PATH else "African" if "African" in PATH else None
         self.format = ".ricepr"
         self.junctions = Junctions()
         self.edges = Edges()
