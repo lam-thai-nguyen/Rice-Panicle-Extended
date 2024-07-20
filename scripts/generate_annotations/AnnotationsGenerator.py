@@ -152,7 +152,7 @@ def test():
     annotations_generator.draw_junctions(show=True)
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
     annotations_generator.draw_grains(show=True)
-    annotations_generator.encode_junctions(save=True, remove_end_generating=True)
+    annotations_generator.encode_junctions(save=False, remove_end_generating=True)
     print("All tests passed")
     
 
