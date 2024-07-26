@@ -181,7 +181,6 @@ class AnnotationsGenerator:
                     
                 grains.append(xywh)
         
-        print(len(grains))
         if save_path:
             save_path = save_path + "/" + self.name + "_grains.txt"
             print(f"==>> Saving {save_path}")
@@ -226,7 +225,12 @@ class AnnotationsGenerator:
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
                     
         elif mode == "grains":
-            pass
+            with open(save_path, "w") as f:
+                for x, y, w, h in boxes:
+                    x, y = int(x) / width, int(y) / height
+                    w, h = w / width, h / height
+                    class_label = 0
+                    f.write(f"{class_label} {x} {y} {w} {h}\n")
                 
     def _xyxy2xywh(self, xyxy) -> tuple:
         """
@@ -262,11 +266,12 @@ def test():
     img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
     ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    # annotations_generator.draw_junctions(show=True, remove_end_generating=True)
-    # annotations_generator.draw_grains(show=True)
-    # annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    # os.remove("10_2_1_1_1_DSC01291_junctions.txt")
+    annotations_generator.draw_junctions(show=True, remove_end_generating=True)
+    annotations_generator.draw_grains(show=True)
+    annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
+    os.remove("10_2_1_1_1_DSC01291_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
+    os.remove("10_2_1_1_1_DSC01291_grains.txt")
     print("All tests passed")
     
 
