@@ -6,7 +6,7 @@ def junctions2img(img_path: str, ricepr_path: str, save_path: str, remove_end_ge
     """
     A utils function to interact with *generate_annotations* module
     
-    This function save an image with the bounding boxes that capture grains of a rice panicle
+    This function save an image with the bounding boxes that capture junctions of a rice panicle
 
     Args:
         img_path (str): original image path
