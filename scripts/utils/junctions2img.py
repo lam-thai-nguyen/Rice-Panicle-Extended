@@ -23,7 +23,7 @@ if __name__ == "__main__":
     african_path = original_img_path + "/African"
     asian_path = original_img_path + "/Asian"
     
-    remove_end_generating = False
+    remove_end_generating = False  # Change this if needed
     
     # =============================== #
     #      Comment out if needed      #
