@@ -121,6 +121,12 @@ class AnnotationsGenerator:
     def encode_grains(self):
         pass
     
+    def draw_junctions_grains(self):
+        pass
+    
+    def encode_junctions_grains(self):
+        pass
+    
     def draw_primary_branches(self):
         pass
     
