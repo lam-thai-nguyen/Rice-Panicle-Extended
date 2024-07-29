@@ -15,7 +15,7 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     """
     assert mode in ["single", "side", "overlay"], "Invalid mode"
     
-    # Retreive info
+    # Retrieve info
     img_name = img_path.split("/")[-1].split(".")[0]
     
     original_folder = "data/raw"
@@ -86,14 +86,19 @@ def _plot_overlay(img1, img2):
 
 
 if __name__ == "__main__":
-    img_path = "data/splits/val/images/2_2_1_2_2_DSC09842.jpg"
-    conf = 0.289
-    
-    visualize_result(
-        img_path=img_path,
-        conf=conf,
-        mode="side",
-        show=True,
-        save_path=""
-    )
-    
+    val_folder = "data/splits/val/images"
+    for filename in os.listdir(val_folder):
+        img_path = f"{val_folder}/{filename}"
+        conf = 0.289
+        mode = "side"
+        show = False
+        save_path = f"visualizations/{mode}"
+        
+        visualize_result(
+            img_path=img_path,
+            conf=conf,
+            mode=mode,
+            show=show,
+            save_path=save_path
+        )
+        
