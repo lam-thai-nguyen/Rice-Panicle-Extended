@@ -1,5 +1,6 @@
 import os
 import cv2
+import torch
 from ultralytics import YOLOv10
 from matplotlib import pyplot as plt
 
@@ -63,8 +64,7 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
         _plot_side(pred_img, label_img, show, num_pred, num_true)
     
     elif mode == "overlay":
-        # Ongoing
-        ...
+        _plot_overlay(pred_img, label_txt, result.orig_shape, show, num_pred, num_true)
         
     if save_path:
         save_path = save_path + "/" + img_name + ".jpg"
@@ -86,9 +86,30 @@ def _plot_side(img1, img2, show=False, *args):
         plt.show()
 
 
-def _plot_overlay(img1, img2):
-    """ongoing"""
-    pass
+def _plot_overlay(pred_img, label_txt, image_shape, show, *args):
+    """Plot true junctions as yellow circle on top of predicted image"""
+    num_pred, num_true = args
+    height, width = image_shape
+    
+    xywhn_true = []
+    with open(label_txt, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            info = line.split(" ")
+            _, x, y, _, _ = int(info[0]), float(info[1]), float(info[2]), float(info[3]), float(info[4])
+            xywhn_true.append((x, y))
+        
+    xywh_true = torch.tensor(xywhn_true) * torch.tensor([width, height])
+    
+    plt.figure(figsize=(8, 8))
+    plt.imshow(pred_img)
+    plt.scatter(xywh_true[:, 0], xywh_true[:, 1], marker="o", color="y", s=30)
+    plt.title(f"{num_pred} junctions - {num_true} junctions")
+    plt.axis("off")
+    plt.tight_layout()
+            
+    if show:
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -96,7 +117,7 @@ if __name__ == "__main__":
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
         conf = 0.289
-        mode = "side"
+        mode = "overlay"
         show = True
         save_path = None
         
