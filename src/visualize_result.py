@@ -15,13 +15,15 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     """
     assert mode in ["single", "side", "overlay"], "Invalid mode"
     
-    # Retrieve info
+    # ================= #
+    #   Retrieve info   #
+    # ================= #
     img_name = img_path.split("/")[-1].split(".")[0]
     
     original_folder = "data/raw"
     annotations_folder = "data/annotations"
     
-    # Get annotation image
+    # Get annotation image and annotation txt
     if os.path.exists(f"{original_folder}/African/{img_name}.jpg"):  # If this is an African rice panicle
         label_img = cv2.imread(f"{annotations_folder}/African/{img_name}_junctions.jpg")
         label_txt = f"{annotations_folder}/African/{img_name}_junctions.txt"
@@ -32,7 +34,9 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     label_img = cv2.cvtColor(label_img, cv2.COLOR_BGR2RGB)
     num_true = len(open(label_txt, "r").readlines())
     
-    # Inference
+    # ================= #
+    #     Inference     # 
+    # ================= #
     checkpoint = "checkpoints/best.pt"
     model = YOLOv10(checkpoint)
     
@@ -43,7 +47,9 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     pred_img = result.plot(conf=False, labels=False)
     pred_img = cv2.cvtColor(pred_img, cv2.COLOR_BGR2RGB)
     
-    # Visualize
+    # ================= #
+    #     Visualize     #
+    # ================= #
     if mode == "single":
         plt.figure(figsize=(8, 8))
         plt.imshow(pred_img)
