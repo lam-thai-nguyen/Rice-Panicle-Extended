@@ -1,9 +1,7 @@
 .vscode/
+__pycache__/
 checkpoints/
 data/
-notebooks/
-scripts/generate_annotations/__pycache__/
-scripts/utils/__pycache__/
-src/
+logs/
 requirements.txt
 README.md
