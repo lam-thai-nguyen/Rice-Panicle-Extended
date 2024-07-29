@@ -97,8 +97,8 @@ if __name__ == "__main__":
         img_path = f"{val_folder}/{filename}"
         conf = 0.289
         mode = "side"
-        show = False
-        save_path = f"visualizations/{mode}"
+        show = True
+        save_path = None
         
         visualize_result(
             img_path=img_path,
@@ -108,3 +108,5 @@ if __name__ == "__main__":
             save_path=save_path
         )
         
+        break
+    
