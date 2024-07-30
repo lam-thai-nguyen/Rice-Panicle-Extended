@@ -3,14 +3,15 @@ import torch
 from ultralytics import YOLOv10
 
 
-def f1score(img_path, checkpoint, conf):
+def f1_score(img_path, checkpoint, conf, iou_threshold):
     """
-    Method: If the IoU between the predicted and true junctions is greater than 0.5, it is a true positive.
+    Method: If the IoU between the predicted and true junctions is greater than a threshold, it is a true positive.
     
     Args:
         img_path (str): image path
         checkpoint (str): checkpoint path
         conf (float): confidence cutoff
+        iou_threshold (float): IoU threshold
     Returns:
         (tuple): f1, precision, recall
     """
@@ -57,11 +58,21 @@ def f1score(img_path, checkpoint, conf):
     iou_matrix = _compute_iou_matrix(xywh_pred, xywh_true)  # Shape: (num_pred, num_true)
     
     max_iou_per_pred = torch.max(iou_matrix, dim=1).values  # Shape: (num_pred,)
-    iou_threshold = 0.5
+    max_iou_per_true = torch.max(iou_matrix, dim=0).values  # Shape: (num_true,)
+    
+    temp1 = torch.sum((max_iou_per_pred > iou_threshold))
+    print(f"==>> temp1: {temp1}")
+    temp2 = torch.sum((max_iou_per_true > iou_threshold))
+    print(f"==>> temp2: {temp2}")
+    
+    exit()
     
     TP = torch.sum((max_iou_per_pred > iou_threshold))
     FP = num_pred - TP
     FN = num_true - TP
+    print(f"==>> TP: {TP}")
+    print(f"==>> FP: {FP}")
+    print(f"==>> FN: {FN}")
     
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
@@ -111,7 +122,8 @@ if __name__ == "__main__":
         img_path = f"{val_folder}/{filename}"
         checkpoint = "checkpoints/best.pt"
         conf = 0.289
-        f1, precision, recall = f1score(img_path=img_path, checkpoint=checkpoint, conf=conf)
+        iou_threshold = 0.2
+        f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
         break  # Comment out if needed
     
