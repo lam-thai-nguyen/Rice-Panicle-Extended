@@ -148,6 +148,7 @@ if __name__ == "__main__":
         conf = 0.289
         # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.
         # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled. 
+        # One more thing, for small object detection (SOD), small IoU doesn't necessarily mean false prediction [1].
         iou_threshold = 0.001  
         f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
@@ -157,3 +158,4 @@ if __name__ == "__main__":
     if save_history:
         save_as_excel(history, save_path)
     
+    # [1] YOLOv8-QSD, Wang, 2024, TIM, available at https://ieeexplore.ieee.org/document/10474434.
