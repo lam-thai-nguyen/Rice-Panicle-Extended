@@ -52,22 +52,36 @@ def f1_score(img_path, checkpoint, conf, iou_threshold):
     height, width = boxes.orig_shape
     xywh_true = xywhn_true * torch.tensor([width, height, width, height])
     
-    # ================= #
-    #     Evaluation    #
-    # ================= #
+    # ===================================================================================================================== #
+    #   Evaluation                                                                                                          #
+    #                                                                                                                       #
+    #   Explanation:                                                                                                        #
+    #       - We create a matrix of IoU between the predicted and true junctions.                                           #
+    #       - We count up the TP by 1 if argmax(predicted) is true and argmax(true) is predicted                            #
+    #           (because sometimes multiple predictions can have high IoU with the same true box)                           #
+    #       - Predicted bounding boxes whose IoU with a matched true box is high but couldn't find a match is counted as FP #
+    # ===================================================================================================================== #
     iou_matrix = _compute_iou_matrix(xywh_pred, xywh_true)  # Shape: (num_pred, num_true)
     
-    max_iou_per_pred = torch.max(iou_matrix, dim=1).values  # Shape: (num_pred,)
-    max_iou_per_true = torch.max(iou_matrix, dim=0).values  # Shape: (num_true,)
+    TP = 0
     
-    temp1 = torch.sum((max_iou_per_pred > iou_threshold))
-    print(f"==>> temp1: {temp1}")
-    temp2 = torch.sum((max_iou_per_true > iou_threshold))
-    print(f"==>> temp2: {temp2}")
+    for idx, pred_box_iou in enumerate(iou_matrix):
+        pred_box_iou[(pred_box_iou < iou_threshold)] = 0.
+        
+        while True:
+            max_iou_idx = torch.argmax(pred_box_iou)
+            
+            if pred_box_iou[max_iou_idx] == 0:
+                break
+            
+            if torch.argmax(iou_matrix[:, max_iou_idx]) == idx:
+                TP += 1
+                iou_matrix[idx, :] = -1
+                iou_matrix[:, max_iou_idx] = -1
+                break
+            else:
+                pred_box_iou[max_iou_idx] = 0.
     
-    exit()
-    
-    TP = torch.sum((max_iou_per_pred > iou_threshold))
     FP = num_pred - TP
     FN = num_true - TP
     print(f"==>> TP: {TP}")
@@ -122,7 +136,9 @@ if __name__ == "__main__":
         img_path = f"{val_folder}/{filename}"
         checkpoint = "checkpoints/best.pt"
         conf = 0.289
-        iou_threshold = 0.2
+        # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.
+        # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled. 
+        iou_threshold = 0.001  
         f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
         break  # Comment out if needed
