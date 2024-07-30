@@ -45,7 +45,12 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     result = results[0]
     num_pred = len(result.boxes)
     
-    pred_img = result.plot(conf=False, labels=False)
+    pred_img = result.plot(
+        conf=False,
+        labels=False, 
+        # font_size=10.,
+        line_width=2,
+        )
     pred_img = cv2.cvtColor(pred_img, cv2.COLOR_BGR2RGB)
     
     # ================= #
@@ -92,23 +97,21 @@ def _plot_side(img1, img2, show=False, *args):
 
 
 def _plot_overlay(pred_img, label_txt, image_shape, show, *args):
-    """Plot true junctions as yellow circle on top of predicted image"""
+    """Plot true junctions as yellow boxes on top of predicted image"""
     num_pred, num_true = args
     height, width = image_shape
+    pred_img = cv2.cvtColor(pred_img, cv2.COLOR_RGB2BGR)
     
-    xywhn_true = []
     with open(label_txt, "r") as f:
         lines = f.readlines()
         for line in lines:
             info = line.split(" ")
-            x, y = float(info[1]), float(info[2])
-            xywhn_true.append((x, y))
-        
-    xywh_true = torch.tensor(xywhn_true) * torch.tensor([width, height])
+            x, y, w, h = float(info[1]) * width, float(info[2]) * height, float(info[3]) * width, float(info[4]) * height
+            x1, y1, x2, y2 = int(x - w / 2), int(y - h / 2), int(x + w / 2), int(y + h / 2)    
+            cv2.rectangle(pred_img, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 255), thickness=2)
     
     plt.figure(figsize=(8, 8))
-    plt.imshow(pred_img)
-    plt.scatter(xywh_true[:, 0], xywh_true[:, 1], marker="o", color="y", s=30)
+    plt.imshow(cv2.cvtColor(pred_img, cv2.COLOR_BGR2RGB))
     plt.title(f"{num_pred} junctions - {num_true} junctions")
     plt.axis("off")
     plt.tight_layout()
