@@ -1,6 +1,7 @@
 import os
 import torch
 from ultralytics import YOLOv10
+import pandas as pd
 
 
 def f1_score(img_path, checkpoint, conf, iou_threshold):
@@ -84,9 +85,6 @@ def f1_score(img_path, checkpoint, conf, iou_threshold):
     
     FP = num_pred - TP
     FN = num_true - TP
-    print(f"==>> TP: {TP}")
-    print(f"==>> FP: {FP}")
-    print(f"==>> FN: {FN}")
     
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
@@ -129,8 +127,20 @@ def _compute_iou_matrix(pred_boxes, true_boxes):
     
     return iou_matrix
     
+
+def save_as_excel(history, save_path):
+    if os.path.exists(save_path):
+        os.remove(save_path)
+    df = pd.DataFrame.from_dict(history, orient="index", columns=["f1", "precision", "recall"])
+    print(f"==>> Saving {save_path}")
+    df.to_excel(save_path)
     
+        
 if __name__ == "__main__":
+    history = dict()
+    save_history = True
+    save_path = "logs/val" + "/f1_score.xlsx"
+    
     val_folder = "data/splits/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
@@ -141,5 +151,9 @@ if __name__ == "__main__":
         iou_threshold = 0.001  
         f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
-        break  # Comment out if needed
+        history[filename] = (f1, precision, recall)
+        # break  # Comment out if needed
+    
+    if save_history:
+        save_as_excel(history, save_path)
     
