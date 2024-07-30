@@ -52,13 +52,7 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     #     Visualize     #
     # ================= #
     if mode == "single":
-        plt.figure(figsize=(8, 8))
-        plt.imshow(pred_img)
-        plt.axis("off")
-        plt.tight_layout()
-        plt.title(f"{num_pred} junctions")
-        if show:
-            plt.show()
+        _plot_single(pred_img, show, num_pred)
         
     elif mode == "side":
         _plot_side(pred_img, label_img, show, num_pred, num_true)
@@ -72,6 +66,17 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
         plt.savefig(save_path)
 
 
+def _plot_single(img, show=False, *args):
+    num_pred = args[0]
+    plt.figure(figsize=(8, 8))
+    plt.imshow(img)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.title(f"{num_pred} junctions")
+    if show:
+        plt.show()
+    
+    
 def _plot_side(img1, img2, show=False, *args):
     num_pred, num_true = args
     _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 7))
@@ -96,7 +101,7 @@ def _plot_overlay(pred_img, label_txt, image_shape, show, *args):
         lines = f.readlines()
         for line in lines:
             info = line.split(" ")
-            _, x, y, _, _ = int(info[0]), float(info[1]), float(info[2]), float(info[3]), float(info[4])
+            x, y = float(info[1]), float(info[2])
             xywhn_true.append((x, y))
         
     xywh_true = torch.tensor(xywhn_true) * torch.tensor([width, height])
@@ -129,5 +134,5 @@ if __name__ == "__main__":
             save_path=save_path
         )
         
-        break
+        break  # Comment out if needed
     
