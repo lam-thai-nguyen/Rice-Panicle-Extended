@@ -153,7 +153,7 @@ if __name__ == "__main__":
         f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
         history[filename] = (f1, precision, recall)
-        # break  # Comment out if needed
+        break  # Comment out if needed
     
     if save_history:
         save_as_excel(history, save_path)
