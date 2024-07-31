@@ -5,10 +5,11 @@ from ultralytics import YOLOv10
 from matplotlib import pyplot as plt
 
 
-def visualize_result(img_path, conf, mode, show=False, save_path=None):
+def visualize_result(img_path, checkpoint, conf, mode, show=False, save_path=None):
     """
     Args:
         img_path (str): image path
+        checkpoint (str): model path
         conf (float): confidence cutoff
         mode (str): "single" or "side" or "overlay"
         show (bool, optional): Defaults to False.
@@ -38,7 +39,6 @@ def visualize_result(img_path, conf, mode, show=False, save_path=None):
     # ================= #
     #     Inference     # 
     # ================= #
-    checkpoint = "checkpoints/best.pt"
     model = YOLOv10(checkpoint)
     
     results = model.predict(source=img_path, conf=conf)
@@ -124,13 +124,15 @@ if __name__ == "__main__":
     val_folder = "data/splits/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        conf = 0.289
+        checkpoint = "checkpoints/run2/best.pt"
+        conf = 0.286
         mode = "overlay"
         show = True
         save_path = None
         
         visualize_result(
             img_path=img_path,
+            checkpoint=checkpoint,
             conf=conf,
             mode=mode,
             show=show,
