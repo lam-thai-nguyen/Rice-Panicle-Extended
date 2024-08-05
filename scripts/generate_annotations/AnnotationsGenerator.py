@@ -51,10 +51,12 @@ class AnnotationsGenerator:
         img_copy = self.img.copy()
         
         for x, y in junctions:
+            # Upscaling
             x, y = int(x * self.factor), int(y * self.factor)
             offset = int(13 * self.factor)
             thickness = 1 + int(self.factor)
             
+            # Draw
             cv2.rectangle(img_copy, pt1=(x - offset, y - offset), pt2=(x + offset, y + offset), color=(0, 255, 255), thickness=thickness)
             
         if show:
@@ -88,41 +90,51 @@ class AnnotationsGenerator:
     def draw_grains(self, save_path=None, show=False):
         img_copy = self.img.copy()
         
+        # Upscaling
+        terminal = self.junctions.return_terminal()
+        terminal = [(int(x * self.factor), int(y * self.factor)) for x, y in terminal]
+        thickness = 1 + int(self.factor)
+        
         for edge in self.edges:
             x1, y1, x2, y2 = edge
+            x1, y1, x2, y2 = int(x1 * self.factor), int(y1 * self.factor), int(x2 * self.factor), int(y2 * self.factor)
             
-            if (x2, y2) in self.junctions.return_terminal():
+            if (x2, y2) in terminal:
                 
                 # ============================================== #
                 #     Conditions to avoid small bounding boxes   #
                 # ============================================== #
                 
-                if abs(y1 - y2) <= 10:
+                if abs(y1 - y2) <= 10 * self.factor:
+                    offset = int(25 * self.factor)
                     if y1 < y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1-25), pt2=(x2, y2+25), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1, y1-offset), pt2=(x2, y2+offset), color=(0, 255, 255), thickness=thickness)
                     elif y1 >= y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1+25), pt2=(x2, y2-25), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1, y1+offset), pt2=(x2, y2-offset), color=(0, 255, 255), thickness=thickness)
                         
-                elif abs(y1 - y2) < 25:
+                elif abs(y1 - y2) < 25 * self.factor:
+                    offset = int(10 * self.factor)
                     if y1 < y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1-10), pt2=(x2, y2+10), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1, y1-offset), pt2=(x2, y2+offset), color=(0, 255, 255), thickness=thickness)
                     elif y1 >= y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1+10), pt2=(x2, y2-10), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1, y1+offset), pt2=(x2, y2-offset), color=(0, 255, 255), thickness=thickness)
                         
-                elif abs(x1 - x2) <= 10:
+                elif abs(x1 - x2) <= 10 * self.factor:
+                    offset = int(25 * self.factor)
                     if x1 < x2:
-                        cv2.rectangle(img_copy, pt1=(x1-25, y1), pt2=(x2+25, y2), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1-offset, y1), pt2=(x2+offset, y2), color=(0, 255, 255), thickness=thickness)
                     elif x1 >= x2:
-                        cv2.rectangle(img_copy, pt1=(x1+25, y1), pt2=(x2-25, y2), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1+offset, y1), pt2=(x2-offset, y2), color=(0, 255, 255), thickness=thickness)
                         
-                elif abs(x1 - x2) < 25:
+                elif abs(x1 - x2) < 25 * self.factor:
+                    offset = int(10 * self.factor)
                     if x1 < x2:
-                        cv2.rectangle(img_copy, pt1=(x1-10, y1), pt2=(x2+10, y2), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1-offset, y1), pt2=(x2+offset, y2), color=(0, 255, 255), thickness=thickness)
                     elif x1 >= x2:
-                        cv2.rectangle(img_copy, pt1=(x1+10, y1), pt2=(x2-10, y2), color=(0, 255, 255), thickness=2)
+                        cv2.rectangle(img_copy, pt1=(x1+offset, y1), pt2=(x2-offset, y2), color=(0, 255, 255), thickness=thickness)
                         
                 else:
-                    cv2.rectangle(img_copy, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 255), thickness=2)
+                    cv2.rectangle(img_copy, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 255), thickness=thickness)
         
         if show:
             self._show(img_copy)
@@ -287,10 +299,10 @@ def test():
     annotations_generator.upscale()
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
     annotations_generator.draw_grains(show=True)
-    exit()
-    annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    os.remove("10_2_1_2_1_DSC01301_junctions.txt")
+    # annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
+    # os.remove("10_2_1_2_1_DSC01301_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
+    exit()
     os.remove("10_2_1_2_1_DSC01301_grains.txt")
     print("All tests passed")
     
