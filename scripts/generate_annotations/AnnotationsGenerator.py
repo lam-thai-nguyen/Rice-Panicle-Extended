@@ -26,6 +26,16 @@ class AnnotationsGenerator:
         self.name = self.ricepr_manager.name
         self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
+        self.factor = 1.
+        
+    def size(self):
+        """Returns the size of the image as (H, W, C) or (rows, cols, channels)"""
+        return self.img.shape
+    
+    def upscale(self, factor=2.):
+        """Upscale the image by the given factor"""
+        self.factor = factor
+        self.img = cv2.resize(self.img, None, fx=factor, fy=factor)
     
     def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
         if remove_end_generating and len(self.junctions.return_generating()) == 2:
@@ -41,7 +51,11 @@ class AnnotationsGenerator:
         img_copy = self.img.copy()
         
         for x, y in junctions:
-            cv2.rectangle(img_copy, pt1=(x - 13, y - 13), pt2=(x + 13, y + 13), color=(0, 255, 255), thickness=2)
+            x, y = int(x * self.factor), int(y * self.factor)
+            offset = int(13 * self.factor)
+            thickness = 1 + int(self.factor)
+            
+            cv2.rectangle(img_copy, pt1=(x - offset, y - offset), pt2=(x + offset, y + offset), color=(0, 255, 255), thickness=thickness)
             
         if show:
             self._show(img_copy)
@@ -263,15 +277,17 @@ class AnnotationsGenerator:
         return xywh
 
 def test():
-    img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
-    ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
+    img_path = "data/raw/Asian/10_2_1_2_1_DSC01301.jpg"
+    ricepr_path = "data/raw/Asian/10_2_1_2_1_DSC01301.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
+    annotations_generator.upscale()
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
+    exit()
     annotations_generator.draw_grains(show=True)
     annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    os.remove("10_2_1_1_1_DSC01291_junctions.txt")
+    os.remove("10_2_1_2_1_DSC01301.txt")
     annotations_generator.encode_grains(save_path=".")
-    os.remove("10_2_1_1_1_DSC01291_grains.txt")
+    os.remove("10_2_1_2_1_DSC01301.txt")
     print("All tests passed")
     
 
