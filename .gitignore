@@ -2,6 +2,7 @@
 __pycache__/
 checkpoints/
 data/
+data_high_res/
 logs/
 visualizations/
 requirements.txt
