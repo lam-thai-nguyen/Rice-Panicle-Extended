@@ -233,8 +233,12 @@ class AnnotationsGenerator:
         if mode == "junctions":
             with open(save_path, "w") as f:
                 for x, y in boxes:
+                    # Upscaling
+                    x, y = int(x * self.factor), int(y * self.factor)
+                    
+                    # Encoding
                     x, y = int(x) / width, int(y) / height
-                    w, h = 26 / width, 26 / height
+                    w, h = 26 * self.factor / width, 26 * self.factor / height
                     class_label = 0
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
                     
@@ -282,12 +286,12 @@ def test():
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
     annotations_generator.upscale()
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
-    exit()
     annotations_generator.draw_grains(show=True)
+    exit()
     annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    os.remove("10_2_1_2_1_DSC01301.txt")
+    os.remove("10_2_1_2_1_DSC01301_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
-    os.remove("10_2_1_2_1_DSC01301.txt")
+    os.remove("10_2_1_2_1_DSC01301_grains.txt")
     print("All tests passed")
     
 
