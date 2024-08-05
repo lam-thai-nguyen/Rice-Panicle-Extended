@@ -164,7 +164,7 @@ class AnnotationsGenerator:
                 #     Conditions to avoid small bounding boxes   #
                 # ============================================== #
                 
-                if abs(y1 - y2) <= 10:
+                if abs(y1 - y2) <= 10 * self.factor:
                     offset = int(25 * self.factor)
                     if y1 < y2:
                         xyxy = (x1, y1-offset, x2, y2+offset)
@@ -173,7 +173,7 @@ class AnnotationsGenerator:
                         xyxy = (x1, y1+offset, x2, y2-offset)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(y1 - y2) < 25:
+                elif abs(y1 - y2) < 25 * self.factor:
                     offset = int(10 * self.factor)
                     if y1 < y2:
                         xyxy = (x1, y1-offset, x2, y2+offset)
@@ -182,7 +182,7 @@ class AnnotationsGenerator:
                         xyxy = (x1, y1+offset, x2, y2-offset)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(x1 - x2) <= 10:
+                elif abs(x1 - x2) <= 10 * self.factor:
                     offset = int(25 * self.factor)
                     if x1 < x2:
                         xyxy = (x1-offset, y1, x2+offset, y2)
@@ -191,7 +191,7 @@ class AnnotationsGenerator:
                         xyxy = (x1+offset, y1, x2-offset, y2)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(x1 - x2) < 25:
+                elif abs(x1 - x2) < 25 * self.factor:
                     offset = int(10 * self.factor)
                     if x1 < x2:
                         xyxy = (x1-offset, y1, x2+offset, y2)
@@ -256,7 +256,7 @@ class AnnotationsGenerator:
         elif mode == "grains":
             with open(save_path, "w") as f:
                 for x, y, w, h in boxes:
-                    x, y = int(x) / width, int(y) / height
+                    x, y = x / width, y / height
                     w, h = w / width, h / height
                     class_label = 0
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
@@ -292,17 +292,16 @@ class AnnotationsGenerator:
         return xywh
 
 def test():
-    img_path = "data/raw/Asian/10_2_1_2_1_DSC01301.jpg"
-    ricepr_path = "data/raw/Asian/10_2_1_2_1_DSC01301.ricepr"
+    img_path = "data/raw/Asian/11_2_1_1_2_DSC01180.jpg"
+    ricepr_path = "data/raw/Asian/11_2_1_1_2_DSC01180.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
     annotations_generator.upscale()
-    # annotations_generator.draw_junctions(show=True, remove_end_generating=True)
-    # annotations_generator.draw_grains(show=True)
+    annotations_generator.draw_junctions(show=True, remove_end_generating=True)
+    annotations_generator.draw_grains(show=True)
     annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    exit()
-    os.remove("10_2_1_2_1_DSC01301_junctions.txt")
+    os.remove("11_2_1_1_2_DSC01180_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
-    os.remove("10_2_1_2_1_DSC01301_grains.txt")
+    os.remove("11_2_1_1_2_DSC01180_grains.txt")
     print("All tests passed")
     
 
