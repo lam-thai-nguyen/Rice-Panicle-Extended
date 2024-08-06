@@ -30,13 +30,13 @@ def train_val_split(mode: str, root_dir: str, save_dir: str, val_size: float, ra
     
     # Combine
     for file_name in os.listdir(african_path):
-        if file_name.endswith("_grains.jpg"):
-            name = file_name[:-len("_grains.jpg")]
+        if file_name.endswith("_junctions.jpg"):
+            name = file_name[:-len("_junctions.jpg")]
             rice_panicles.append(name)
 
     for file_name in os.listdir(asian_path):
-        if file_name.endswith("_grains.jpg"):
-            name = file_name[:-len("_grains.jpg")]
+        if file_name.endswith("_junctions.jpg"):
+            name = file_name[:-len("_junctions.jpg")]
             rice_panicles.append(name)
            
     # Shuffle 
@@ -66,10 +66,10 @@ def _process_files(mode: str, val: list, train: list, save_dir: str):
     assert mode in ["junctions", "grains", "all"], "Invalid mode"
     postfix = f"_{mode}"
     
-    african_orig_path = "data/raw/African"
-    asian_orig_path = "data/raw/Asian"
-    african_annotations_path = "data/annotations/African"
-    asian_annotations_path = "data/annotations/Asian"
+    african_orig_path = "data/raw/African"  # Change to "data_high_res/raw/African" for high resolution dataset
+    asian_orig_path = "data/raw/Asian"  # Change to "data_high_res/raw/Asian" for high resolution dataset
+    african_annotations_path = "data/annotations/African"  # Change to "data_high_res/annotations/African" for high resolution dataset
+    asian_annotations_path = "data/annotations/Asian"  # Change to "data_high_res/annotations/Asian" for high resolution dataset
     
     for file_name in val:
         if os.path.exists(african_orig_path + "/" + file_name + ".jpg"):  # If this is an African rice panicle
@@ -105,8 +105,8 @@ if __name__ == "__main__":
     
     train, val = train_val_split(
         mode=mode,
-        root_dir="data/annotations",
-        save_dir="data/splits",
+        root_dir="data/annotations",  # Change to "data_high_res/annotations" for high resolution dataset
+        save_dir="data/splits",  # Change to "data_high_res/splits" for high resolution dataset
         val_size=0.3
     )
     
