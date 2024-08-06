@@ -145,7 +145,7 @@ if __name__ == "__main__":
     val_folder = "data/splits/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        checkpoint = "checkpoints/run2/best.pt"
+        checkpoint = f"checkpoints/{split_name}/run2/best.pt"
         conf = 0.286
         # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.
         # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled. 

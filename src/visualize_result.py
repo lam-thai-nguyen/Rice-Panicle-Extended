@@ -125,7 +125,7 @@ if __name__ == "__main__":
     val_folder = f"data/splits/{split_name}/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        checkpoint = "checkpoints/run2/best.pt"
+        checkpoint = f"checkpoints/{split_name}/run2/best.pt"
         conf = 0.286
         mode = "overlay"
         show = True
