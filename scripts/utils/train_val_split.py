@@ -102,11 +102,12 @@ def _process_files(mode: str, val: list, train: list, save_dir: str):
 
 if __name__ == "__main__":
     mode = "junctions"
+    split_name = "split2"  # Change this if needed
     
     train, val = train_val_split(
         mode=mode,
         root_dir="data/annotations",  # Change to "data_high_res/annotations" for high resolution dataset
-        save_dir="data/splits",  # Change to "data_high_res/splits" for high resolution dataset
+        save_dir=f"data/splits/{split_name}",  # Change to "data_high_res/splits" for high resolution dataset
         val_size=0.3
     )
     
