@@ -139,7 +139,8 @@ def save_as_excel(history, save_path):
 if __name__ == "__main__":
     history = dict()
     save_history = True
-    save_path = "logs/val" + "/f1_score.xlsx"
+    split_name = "split2"  # Change this if needed
+    save_path = f"logs/{split_name}/val" + "/f1_score.xlsx"
     
     val_folder = "data/splits/val/images"
     for filename in os.listdir(val_folder):
