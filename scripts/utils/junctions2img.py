@@ -40,6 +40,7 @@ if __name__ == "__main__":
                 save_path="data/annotations/African",
                 remove_end_generating=remove_end_generating
             )
+            break  # Comment out if needed
     
     
     for original_img in os.listdir(asian_path):
@@ -53,4 +54,5 @@ if __name__ == "__main__":
                 save_path="data/annotations/Asian",
                 remove_end_generating=remove_end_generating
             )
+            break  # Comment out if needed
             
