@@ -15,7 +15,6 @@ def junctions2img(img_path: str, ricepr_path: str, save_path: str, remove_end_ge
         remove_end_generating (bool, optional): Defaults to False.
     """
     generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    # generator.upscale()  # Uncomment for upscaling
     generator.draw_junctions(save_path=save_path, remove_end_generating=remove_end_generating)
     
     
@@ -38,7 +37,7 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/African",  # change to "data/annotations/African" for high resolution dataset
+                save_path="data/annotations/African",
                 remove_end_generating=remove_end_generating
             )
             break  # Comment out if needed
@@ -51,7 +50,7 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/Asian",  # change to "data/annotations/Asian" for high resolution dataset
+                save_path="data/annotations/Asian",
                 remove_end_generating=remove_end_generating
             )
             break  # Comment out if needed
