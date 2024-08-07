@@ -66,10 +66,10 @@ def _process_files(mode: str, val: list, train: list, save_dir: str):
     assert mode in ["junctions", "grains", "all"], "Invalid mode"
     postfix = f"_{mode}"
     
-    african_orig_path = "data/raw/African"  # Change to "data_high_res/raw/African" for high resolution dataset
-    asian_orig_path = "data/raw/Asian"  # Change to "data_high_res/raw/Asian" for high resolution dataset
-    african_annotations_path = "data/annotations/African"  # Change to "data_high_res/annotations/African" for high resolution dataset
-    asian_annotations_path = "data/annotations/Asian"  # Change to "data_high_res/annotations/Asian" for high resolution dataset
+    african_orig_path = "data/raw/African"
+    asian_orig_path = "data/raw/Asian"
+    african_annotations_path = "data/annotations/African"
+    asian_annotations_path = "data/annotations/Asian"
     
     for file_name in val:
         if os.path.exists(african_orig_path + "/" + file_name + ".jpg"):  # If this is an African rice panicle
@@ -106,8 +106,8 @@ if __name__ == "__main__":
     
     train, val = train_val_split(
         mode=mode,
-        root_dir="data/annotations",  # Change to "data_high_res/annotations" for high resolution dataset
-        save_dir=f"data/splits/{split_name}",  # Change to "data_high_res/splits" for high resolution dataset
+        root_dir="data/annotations",
+        save_dir=f"data/splits/{split_name}",
         val_size=0.3
     )
     
