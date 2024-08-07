@@ -26,17 +26,7 @@ class AnnotationsGenerator:
         self.name = self.ricepr_manager.name
         self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
-        self.factor = 1.
-        
-    def size(self):
-        """Returns the size of the image as (H, W, C) or (rows, cols, channels)"""
-        return self.img.shape
-    
-    def upscale(self, factor=2.):
-        """Upscale the image by the given factor"""
-        self.factor = factor
-        self.img = cv2.resize(self.img, None, fx=factor, fy=factor)
-    
+
     def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
         if remove_end_generating and len(self.junctions.return_generating()) == 2:
             self.junctions.remove_end_generating()
@@ -49,16 +39,10 @@ class AnnotationsGenerator:
         junctions = generating + primary + secondary + tertiary + quaternary
         
         img_copy = self.img.copy()
-        
+
         for x, y in junctions:
-            # Upscaling
-            x, y = int(x * self.factor), int(y * self.factor)
-            offset = int(13 * self.factor)
-            thickness = 1 + int(self.factor)
-            
-            # Draw
-            cv2.rectangle(img_copy, pt1=(x - offset, y - offset), pt2=(x + offset, y + offset), color=(0, 255, 255), thickness=thickness)
-            
+            cv2.rectangle(img_copy, pt1=(x - 13, y - 13), pt2=(x + 13, y + 13), color=(0, 255, 255), thickness=2)
+
         if show:
             self._show(img_copy)
             
@@ -90,51 +74,41 @@ class AnnotationsGenerator:
     def draw_grains(self, save_path=None, show=False):
         img_copy = self.img.copy()
         
-        # Upscaling
-        terminal = self.junctions.return_terminal()
-        terminal = [(int(x * self.factor), int(y * self.factor)) for x, y in terminal]
-        thickness = 1 + int(self.factor)
-        
         for edge in self.edges:
             x1, y1, x2, y2 = edge
-            x1, y1, x2, y2 = int(x1 * self.factor), int(y1 * self.factor), int(x2 * self.factor), int(y2 * self.factor)
             
-            if (x2, y2) in terminal:
+            if (x2, y2) in self.junctions.return_terminal():
                 
                 # ============================================== #
                 #     Conditions to avoid small bounding boxes   #
                 # ============================================== #
                 
-                if abs(y1 - y2) <= 10 * self.factor:
-                    offset = int(25 * self.factor)
+                if abs(y1 - y2) <= 10:
                     if y1 < y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1-offset), pt2=(x2, y2+offset), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1, y1-25), pt2=(x2, y2+25), color=(0, 255, 255), thickness=2)
                     elif y1 >= y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1+offset), pt2=(x2, y2-offset), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1, y1+25), pt2=(x2, y2-25), color=(0, 255, 255), thickness=2)
                         
-                elif abs(y1 - y2) < 25 * self.factor:
-                    offset = int(10 * self.factor)
+                elif abs(y1 - y2) < 25:
                     if y1 < y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1-offset), pt2=(x2, y2+offset), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1, y1-10), pt2=(x2, y2+10), color=(0, 255, 255), thickness=2)
                     elif y1 >= y2:
-                        cv2.rectangle(img_copy, pt1=(x1, y1+offset), pt2=(x2, y2-offset), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1, y1+10), pt2=(x2, y2-10), color=(0, 255, 255), thickness=2)
                         
-                elif abs(x1 - x2) <= 10 * self.factor:
-                    offset = int(25 * self.factor)
+                elif abs(x1 - x2) <= 10:
                     if x1 < x2:
-                        cv2.rectangle(img_copy, pt1=(x1-offset, y1), pt2=(x2+offset, y2), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1-25, y1), pt2=(x2+25, y2), color=(0, 255, 255), thickness=2)
                     elif x1 >= x2:
-                        cv2.rectangle(img_copy, pt1=(x1+offset, y1), pt2=(x2-offset, y2), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1+25, y1), pt2=(x2-25, y2), color=(0, 255, 255), thickness=2)
                         
-                elif abs(x1 - x2) < 25 * self.factor:
-                    offset = int(10 * self.factor)
+                elif abs(x1 - x2) < 25:
                     if x1 < x2:
-                        cv2.rectangle(img_copy, pt1=(x1-offset, y1), pt2=(x2+offset, y2), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1-10, y1), pt2=(x2+10, y2), color=(0, 255, 255), thickness=2)
                     elif x1 >= x2:
-                        cv2.rectangle(img_copy, pt1=(x1+offset, y1), pt2=(x2-offset, y2), color=(0, 255, 255), thickness=thickness)
+                        cv2.rectangle(img_copy, pt1=(x1+10, y1), pt2=(x2-10, y2), color=(0, 255, 255), thickness=2)
                         
                 else:
-                    cv2.rectangle(img_copy, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 255), thickness=thickness)
+                    cv2.rectangle(img_copy, pt1=(x1, y1), pt2=(x2, y2), color=(0, 255, 255), thickness=2)
         
         if show:
             self._show(img_copy)
@@ -150,54 +124,45 @@ class AnnotationsGenerator:
         """
         grains = list()
         
-        # Upscaling
-        terminal = self.junctions.return_terminal()
-        terminal = [(int(x * self.factor), int(y * self.factor)) for x, y in terminal]
-        
         for edge in self.edges:
             x1, y1, x2, y2 = edge
-            x1, y1, x2, y2 = int(x1 * self.factor), int(y1 * self.factor), int(x2 * self.factor), int(y2 * self.factor)
             
-            if (x2, y2) in terminal:
+            if (x2, y2) in self.junctions.return_terminal():
                 
                 # ============================================== #
                 #     Conditions to avoid small bounding boxes   #
                 # ============================================== #
                 
-                if abs(y1 - y2) <= 10 * self.factor:
-                    offset = int(25 * self.factor)
+                if abs(y1 - y2) <= 10:
                     if y1 < y2:
-                        xyxy = (x1, y1-offset, x2, y2+offset)
+                        xyxy = (x1, y1-25, x2, y2+25)
                         xywh = self._xyxy2xywh(xyxy)
                     elif y1 >= y2:
-                        xyxy = (x1, y1+offset, x2, y2-offset)
+                        xyxy = (x1, y1+25, x2, y2-25)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(y1 - y2) < 25 * self.factor:
-                    offset = int(10 * self.factor)
+                elif abs(y1 - y2) < 25:
                     if y1 < y2:
-                        xyxy = (x1, y1-offset, x2, y2+offset)
+                        xyxy = (x1, y1-10, x2, y2+10)
                         xywh = self._xyxy2xywh(xyxy)
                     elif y1 >= y2:
-                        xyxy = (x1, y1+offset, x2, y2-offset)
+                        xyxy = (x1, y1+10, x2, y2-10)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(x1 - x2) <= 10 * self.factor:
-                    offset = int(25 * self.factor)
+                elif abs(x1 - x2) <= 10:
                     if x1 < x2:
-                        xyxy = (x1-offset, y1, x2+offset, y2)
+                        xyxy = (x1-25, y1, x2+25, y2)
                         xywh = self._xyxy2xywh(xyxy)
                     elif x1 >= x2:
-                        xyxy = (x1+offset, y1, x2-offset, y2)
+                        xyxy = (x1+25, y1, x2-25, y2)
                         xywh = self._xyxy2xywh(xyxy)
                         
-                elif abs(x1 - x2) < 25 * self.factor:
-                    offset = int(10 * self.factor)
+                elif abs(x1 - x2) < 25:
                     if x1 < x2:
-                        xyxy = (x1-offset, y1, x2+offset, y2)
+                        xyxy = (x1-10, y1, x2+10, y2)
                         xywh = self._xyxy2xywh(xyxy)
                     elif x1 >= x2:
-                        xyxy = (x1+offset, y1, x2-offset, y2)
+                        xyxy = (x1+10, y1, x2-10, y2)
                         xywh = self._xyxy2xywh(xyxy)
                         
                 else:
@@ -244,12 +209,8 @@ class AnnotationsGenerator:
         if mode == "junctions":
             with open(save_path, "w") as f:
                 for x, y in boxes:
-                    # Upscaling
-                    x, y = x * self.factor, y * self.factor
-                    
-                    # Encoding
                     x, y = int(x) / width, int(y) / height
-                    w, h = 26 * self.factor / width, 26 * self.factor / height
+                    w, h = 26 / width, 26 / height
                     class_label = 0
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
                     
@@ -264,12 +225,6 @@ class AnnotationsGenerator:
     def _xyxy2xywh(self, xyxy) -> tuple:
         """
         Turns a bounding box in (x1, y1, x2, y2) format into (x, y, w, h)
-
-        Args:
-            xyxy (tuple): (x1, y1, x2, y2)
-            
-        Returns:
-            tuple: (x, y, w, h)
         """
         x1, y1, x2, y2 = xyxy
         
@@ -292,18 +247,17 @@ class AnnotationsGenerator:
         return xywh
 
 def test():
-    img_path = "data/raw/Asian/11_2_1_1_2_DSC01180.jpg"
-    ricepr_path = "data/raw/Asian/11_2_1_1_2_DSC01180.ricepr"
+    img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
+    ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    annotations_generator.upscale()
     annotations_generator.draw_junctions(show=True, remove_end_generating=True)
     annotations_generator.draw_grains(show=True)
-    annotations_generator.encode_junctions(save_path=".", remove_end_generating=True)
-    os.remove("11_2_1_1_2_DSC01180_junctions.txt")
+    annotations_generator.encode_junctions(save_path=".", remove_end_generating=False)
+    os.remove("10_2_1_1_1_DSC01291_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
-    os.remove("11_2_1_1_2_DSC01180_grains.txt")
+    os.remove("10_2_1_1_1_DSC01291_grains.txt")
     print("All tests passed")
-    
+
 
 if __name__ == "__main__":
     test()
