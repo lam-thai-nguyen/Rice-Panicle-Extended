@@ -86,6 +86,8 @@ def f1_score(img_path, checkpoint, conf, iou_threshold):
     FP = num_pred - TP
     FN = num_true - TP
     
+    print(TP, FP, FN)
+    
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
     f1 = 2 * (precision * recall) / (precision + recall)
@@ -138,19 +140,20 @@ def save_as_excel(history, save_path):
         
 if __name__ == "__main__":
     history = dict()
-    save_history = True
+    save_history = False  # Change this if needed
     split_name = "split2"  # Change this if needed
+    run_name = "run3"  # Change this if needed
     save_path = f"logs/{split_name}/val" + "/f1_score.xlsx"
     
-    val_folder = "data/splits/val/images"
+    val_folder = f"data/splits/{split_name}/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        checkpoint = f"checkpoints/{split_name}/run2/best.pt"
-        conf = 0.286
+        checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt"
+        conf = 0.253
         # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.
         # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled. 
         # One more thing, for small object detection (SOD), small IoU doesn't necessarily mean false prediction [1].
-        iou_threshold = 0.001  
+        iou_threshold = 0.001
         f1, precision, recall = f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
         print(f"==>> f1: {f1:.2f}, precision: {precision:.2f}, recall: {recall:.2f}")
         history[filename] = (f1, precision, recall)

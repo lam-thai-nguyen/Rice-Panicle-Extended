@@ -122,11 +122,12 @@ def _plot_overlay(pred_img, label_txt, image_shape, show, *args):
 
 if __name__ == "__main__":
     split_name = "split2"  # Change this if needed
+    run_name = "run3"  # Change this if needed
     val_folder = f"data/splits/{split_name}/val/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        checkpoint = f"checkpoints/{split_name}/run2/best.pt"
-        conf = 0.286
+        checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt"
+        conf = 0.253
         mode = "overlay"
         show = True
         save_path = None
