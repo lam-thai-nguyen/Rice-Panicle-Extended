@@ -86,8 +86,6 @@ def f1_score(img_path, checkpoint, conf, iou_threshold):
     FP = num_pred - TP
     FN = num_true - TP
     
-    print(TP, FP, FN)
-    
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
     f1 = 2 * (precision * recall) / (precision + recall)
@@ -140,12 +138,13 @@ def save_as_excel(history, save_path):
         
 if __name__ == "__main__":
     history = dict()
-    save_history = False  # Change this if needed
+    save_history = True  # Change this if needed
+    mode = "val"  # Change this if needed [train or val]
     split_name = "split2"  # Change this if needed
     run_name = "run3"  # Change this if needed
-    save_path = f"logs/{split_name}/val" + "/f1_score.xlsx"
+    save_path = f"logs/{split_name}/{run_name}/{mode}" + "/f1_score.xlsx"
     
-    val_folder = f"data/splits/{split_name}/val/images"
+    val_folder = f"data/splits/{split_name}/{mode}/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
         checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt"
