@@ -25,9 +25,9 @@ def plot_f1_score(xlsx_file, save_path):
     count = metrics[metrics['f1'] <= threshold]['f1'].count()
     
     # Plot values below threshold
-    sns.histplot(metrics[metrics['f1'] <= threshold]['f1'], ax=ax1, color='blue', bins=10, label=f"Error analysis ({count})", alpha=0.2)
+    sns.histplot(metrics[metrics['f1'] <= threshold]['f1'], ax=ax1, color='blue', bins=14, label=f"Error analysis ({count})", alpha=0.2)
     # Plot values above threshold
-    sns.histplot(metrics[metrics['f1'] > threshold]['f1'], kde=True, ax=ax1, color='blue', bins=20)
+    sns.histplot(metrics[metrics['f1'] > threshold]['f1'], kde=True, ax=ax1, color='blue', bins=16)
     # Plot threshold
     ax1.axvline(threshold, color='black', linestyle='dashed', linewidth=2, label=f'Threshold: {threshold:.4f}')
     
@@ -56,7 +56,7 @@ def plot_f1_score(xlsx_file, save_path):
 if __name__ == "__main__":
     split_name = 'split2'  # Change this if needed
     run_name = 'run3'  # Change this if needed
-    mode = 'val'  # Change this if needed
+    mode = 'train'  # Change this if needed
     xlsx_file = f'logs/{split_name}/{run_name}/{mode}/f1_score.xlsx'
     save_path = f'logs/{split_name}/{run_name}/{mode}/f1_score.png'
     plot_f1_score(xlsx_file, save_path)
