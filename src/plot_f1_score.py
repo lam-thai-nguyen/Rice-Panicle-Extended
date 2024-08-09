@@ -29,7 +29,7 @@ def plot_f1_score(xlsx_file, save_path):
     # Plot values above threshold
     sns.histplot(metrics[metrics['f1'] > threshold]['f1'], kde=True, ax=ax1, color='blue', bins=20)
     # Plot threshold
-    ax1.axvline(threshold, color='black', linestyle='dashed', linewidth=2, label=f'Threshold: {threshold:.4f}\n({factor} std below mean)')
+    ax1.axvline(threshold, color='black', linestyle='dashed', linewidth=2, label=f'Threshold: {threshold:.4f}')
     
     ax1.set_xlabel("$F_1$ Score")
     ax1.legend()
