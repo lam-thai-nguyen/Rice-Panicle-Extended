@@ -20,7 +20,7 @@ def plot_f1_score(xlsx_file, save_path):
     mean_f1 = metrics['f1'].mean()
     ax1.axvline(mean_f1, color='blue', linestyle='dashed', linewidth=2, label=f'Mean: {mean_f1 * 100:.2f}%')
     
-    factor = 1.0  # Change this if needed
+    factor = 1.5  # Change this if needed
     threshold = metrics['f1'].mean() - factor * metrics['f1'].std()
     count = metrics[metrics['f1'] <= threshold]['f1'].count()
     
