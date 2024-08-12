@@ -140,15 +140,15 @@ if __name__ == "__main__":
     history = dict()
     save_history = True  # Change this if needed
     mode = "val"  # Change this if needed [train or val]
-    split_name = "split2"  # Change this if needed
-    run_name = "run3"  # Change this if needed
-    save_path = f"logs/{split_name}/{run_name}/{mode}" + "/f1_score.xlsx"
+    split_name = "split3"  # Change this if needed
+    run_name = ""  # Change this if needed
+    save_path = f"logs/{split_name}/{run_name}/{mode}" + "/f1_score.xlsx" if run_name else f"logs/{split_name}/{mode}" + "/f1_score.xlsx"
     
     val_folder = f"data/splits/{split_name}/{mode}/images"
     for filename in os.listdir(val_folder):
         img_path = f"{val_folder}/{filename}"
-        checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt"
-        conf = 0.253
+        checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt" if run_name else f"checkpoints/{split_name}/best.pt"
+        conf = 0.239
         # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.
         # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled. 
         # One more thing, for small object detection (SOD), small IoU doesn't necessarily mean false prediction [1].
