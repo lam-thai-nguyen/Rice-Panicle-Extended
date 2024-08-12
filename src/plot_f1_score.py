@@ -54,9 +54,9 @@ def plot_f1_score(xlsx_file, save_path):
 
 
 if __name__ == "__main__":
-    split_name = 'split2'  # Change this if needed
-    run_name = 'run3'  # Change this if needed
+    split_name = 'split3'  # Change this if needed
+    run_name = ''  # Change this if needed
     mode = 'train'  # Change this if needed
-    xlsx_file = f'logs/{split_name}/{run_name}/{mode}/f1_score.xlsx'
-    save_path = f'logs/{split_name}/{run_name}/{mode}/f1_score.png'
+    xlsx_file = f'logs/{split_name}/{run_name}/{mode}/f1_score.xlsx' if run_name else f'logs/{split_name}/{mode}/f1_score.xlsx'
+    save_path = f'logs/{split_name}/{run_name}/{mode}/f1_score.png' if run_name else f'logs/{split_name}/{mode}/f1_score.png'
     plot_f1_score(xlsx_file, save_path)
