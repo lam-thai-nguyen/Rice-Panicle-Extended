@@ -37,8 +37,8 @@ def plot_result(csv_file, save_path):
     
 
 if __name__ == '__main__':
-    split_name = 'split3'
-    run_name = ''
+    split_name = 'split4'  # Change this if needed
+    run_name = ''  # Change this if needed
     path = f'logs/{split_name}/{run_name}/train' if run_name else f'logs/{split_name}/train'
     csv_file = f'{path}/results.csv'
     save_path = f'{path}/results.png'
