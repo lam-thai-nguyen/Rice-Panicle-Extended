@@ -1,8 +1,8 @@
 import os
 import cv2
-import torch
 from ultralytics import YOLOv10
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 
 def visualize_result(img_path, checkpoint, conf, mode, show=False, save_path=None):
@@ -124,22 +124,27 @@ if __name__ == "__main__":
     split_name = "split4"  # Change this if needed
     run_name = ""  # Change this if needed
     val_folder = f"data/splits/{split_name}/val/images"
-    for filename in os.listdir(val_folder):
-        img_path = f"{val_folder}/{filename}"
-        checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt" if run_name else f"checkpoints/{split_name}/best.pt"
-        conf = 0.309  # Change this if needed
-        mode = "side"  # Change this if needed
-        show = True  # Change this if needed
-        save_path = None  # Change this if needed
-        
-        visualize_result(
-            img_path=img_path,
-            checkpoint=checkpoint,
-            conf=conf,
-            mode=mode,
-            show=show,
-            save_path=save_path
-        )
-        
-        break  # Comment out if needed
+    
+    with tqdm(os.listdir(val_folder), desc="Visualizing") as pbar:
+        for filename in pbar:
+            img_path = f"{val_folder}/{filename}"
+            checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt" if run_name else f"checkpoints/{split_name}/best.pt"
+            conf = 0.309  # Change this if needed
+            mode = "side"  # Change this if needed
+            show = True  # Change this if needed
+            save_path = None  # Change this if needed
+            
+            visualize_result(
+                img_path=img_path,
+                checkpoint=checkpoint,
+                conf=conf,
+                mode=mode,
+                show=show,
+                save_path=save_path
+            )
+            
+            # Update progress bar
+            pbar.set_postfix({"mode": mode, "conf": conf})
+            
+            break  # Comment out if needed
     
