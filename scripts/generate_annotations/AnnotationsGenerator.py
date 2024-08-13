@@ -39,7 +39,7 @@ class AnnotationsGenerator:
         junctions = generating + primary + secondary + tertiary + quaternary
         
         img_copy = self.img.copy()
-        bbox_size = 26
+        bbox_size = 34
 
         for x, y in junctions:
             cv2.rectangle(img_copy, pt1=(x - bbox_size//2, y - bbox_size//2), pt2=(x + bbox_size//2, y + bbox_size//2), color=(0, 255, 255), thickness=2)
@@ -211,7 +211,7 @@ class AnnotationsGenerator:
             with open(save_path, "w") as f:
                 for x, y in boxes:
                     x, y = int(x) / width, int(y) / height
-                    bbox_size = 26
+                    bbox_size = 34
                     w, h = bbox_size / width, bbox_size / height
                     class_label = 0
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
