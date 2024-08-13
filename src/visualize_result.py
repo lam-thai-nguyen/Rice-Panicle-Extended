@@ -127,6 +127,7 @@ if __name__ == "__main__":
     
     with tqdm(os.listdir(val_folder), desc="Visualizing") as pbar:
         for filename in pbar:
+            # Configuration
             img_path = f"{val_folder}/{filename}"
             checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt" if run_name else f"checkpoints/{split_name}/best.pt"
             conf = 0.309  # Change this if needed
@@ -134,6 +135,7 @@ if __name__ == "__main__":
             show = True  # Change this if needed
             save_path = None  # Change this if needed
             
+            # Get results
             visualize_result(
                 img_path=img_path,
                 checkpoint=checkpoint,
