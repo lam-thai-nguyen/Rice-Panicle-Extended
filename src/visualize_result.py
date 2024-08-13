@@ -123,7 +123,8 @@ def _plot_overlay(pred_img, label_txt, image_shape, show, *args):
 if __name__ == "__main__":
     split_name = "split4"  # Change this if needed
     run_name = ""  # Change this if needed
-    val_folder = f"data/splits/{split_name}/val/images"
+    task = "val"  # Change this if needed [train or val]
+    val_folder = f"data/splits/{split_name}/{task}/images"
     
     with tqdm(os.listdir(val_folder), desc="Visualizing") as pbar:
         for filename in pbar:
