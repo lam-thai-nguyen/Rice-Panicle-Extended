@@ -26,6 +26,7 @@ class AnnotationsGenerator:
         self.name = self.ricepr_manager.name
         self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
+        self.bbox_size = 46  # Change this if needed
 
     def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
         if remove_end_generating and len(self.junctions.return_generating()) == 2:
@@ -39,7 +40,7 @@ class AnnotationsGenerator:
         junctions = generating + primary + secondary + tertiary + quaternary
         
         img_copy = self.img.copy()
-        bbox_size = 34
+        bbox_size = self.bbox_size
 
         for x, y in junctions:
             cv2.rectangle(img_copy, pt1=(x - bbox_size//2, y - bbox_size//2), pt2=(x + bbox_size//2, y + bbox_size//2), color=(0, 255, 255), thickness=2)
@@ -211,7 +212,7 @@ class AnnotationsGenerator:
             with open(save_path, "w") as f:
                 for x, y in boxes:
                     x, y = int(x) / width, int(y) / height
-                    bbox_size = 34
+                    bbox_size = self.bbox_size
                     w, h = bbox_size / width, bbox_size / height
                     class_label = 0
                     f.write(f"{class_label} {x} {y} {w} {h}\n")
