@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import uniform_filter1d
 
 
-def plot_result(csv_file, save_path):
+def plot_loss(csv_file, save_path):
     # Read the csv file and get the columns
     df = pd.read_csv(csv_file)
     df.columns = df.columns.str.strip()
@@ -33,6 +33,7 @@ def plot_result(csv_file, save_path):
     
     plt.tight_layout()
     plt.savefig(save_path)
+    plt.close('all')
     print(f"==>> Saving {save_path}")
     
 
@@ -42,5 +43,5 @@ if __name__ == '__main__':
     path = f'logs/{split_name}/{run_name}/train' if run_name else f'logs/{split_name}/train'
     csv_file = f'{path}/results.csv'
     save_path = f'{path}/results.png'
-    plot_result(csv_file, save_path)
+    plot_loss(csv_file, save_path)
     
