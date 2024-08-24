@@ -25,13 +25,29 @@ def main(split_name, run_name, plot_loss=False, predict_show=False, mode="train"
     
 
 if __name__ == "__main__":
-    split_name = "split9"
+    # ============================================= #
+    #                   HINTS                       #
+    # ============================================= #
+    conf_helpers = {  
+        "split4": [0.304, 0.309],
+        "split5": [0.275, 0.270],  # train, val confs
+        "split6": [0.323, 0.322],
+        "split7": [0.294, 0.292],
+        "split8": [0.233, 0.233],
+        "split9": [0.310, 0.310],  
+    }
+    freq_used = {
+        "lots_of_problems": "43_2_1_1_2_DSC09658_.jpg",
+        "lots_of_junctions": "37_2_1_1_1_DSC01221.jpg",
+    }
+    
+    split_name = "split8"
     run_name = ""
-    plot_loss = True
+    plot_loss = False
     predict_show = True
     mode = "train"
-    conf = 0.310
-    img_name = "3_2_1_1_1_DSC01263.jpg"
+    conf = 0.233
+    img_name = "43_2_1_1_2_DSC09658_.jpg"
     visual_mode = "side"
     show = True
     save_path = None
