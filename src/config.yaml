@@ -1,0 +1,13 @@
+confidence: # [train conf, val conf]
+  split4: [0.304, 0.309]
+  split5: [0.244, 0.246]
+  split6: [0.275, 0.270]
+  split7: [0.323, 0.322]
+  split8: [0.294, 0.292]
+  split9: [0.233, 0.233]
+  split10: [0.310, 0.310]
+  split11: [0.385, 0.388]
+
+benchmark_image:
+  lots_of_problems: "43_2_1_1_2_DSC09658_.jpg"
+  lots_of_junctions: "37_2_1_1_1_DSC01221.jpg"
