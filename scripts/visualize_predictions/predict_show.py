@@ -73,7 +73,7 @@ def predict_show(img_path, checkpoint, conf, mode, show=False, save_path=None):
 
 def _plot_single(img, show=False, *args):
     num_pred = args[0]
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(8, 9))
     plt.imshow(img)
     plt.axis("off")
     plt.tight_layout()
