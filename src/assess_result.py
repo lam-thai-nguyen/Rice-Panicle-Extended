@@ -22,9 +22,9 @@ if __name__ == "__main__":
         
     confidence = config["confidence"]
     
-    split_name = "split11"
-    run_name = ""
-    mode = "val"
+    split_name = "split12"  # Change this if needed
+    run_name = ""  # Change this if needed
+    mode = "val"  # Change this if needed
     conf = confidence[split_name][0] if mode == "train" else confidence[split_name][1]
     iou_threshold = 0.1
 
