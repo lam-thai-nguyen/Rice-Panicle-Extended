@@ -8,7 +8,7 @@ confidence: # [train conf, val conf]
   split10: [0.310, 0.310]
   split11: [0.385, 0.388]
   split12: [0.345, 0.343]
-  split13: [..., ...]
+  split13: [0.399, 0.400]
   split14: [..., ...]
 
 benchmark_image:

@@ -22,7 +22,7 @@ if __name__ == "__main__":
         
     confidence = config["confidence"]
     
-    split_name = "split12"  # Change this if needed
+    split_name = "split13"  # Change this if needed
     run_name = ""  # Change this if needed
     mode = "val"  # Change this if needed
     conf = confidence[split_name][0] if mode == "train" else confidence[split_name][1]
