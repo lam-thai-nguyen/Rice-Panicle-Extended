@@ -40,7 +40,7 @@ def show_update_img(img_path):
     plt.figure(figsize=(10, 9))
     plt.imshow(original_img)
     for x, y in junctions:
-        plt.scatter(x, y, marker='o', c="yellow", s=7)
+        plt.scatter(x, y, marker='o', c="yellow", s=35, alpha=0.5)
     plt.axis("off")
     plt.tight_layout()
     plt.show()
