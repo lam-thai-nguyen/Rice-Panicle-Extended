@@ -9,8 +9,6 @@ from ..generate_annotations.riceprManager import riceprManager
 from .ClickHandler import ClickHandler
 import matplotlib.pyplot as plt
 from PIL import Image
-
-
 class InteractiveLabelling:
     def __init__(self, img_path):
         self.img_path = img_path
@@ -24,7 +22,7 @@ class InteractiveLabelling:
     def run(self):
         cid = self.click_handler.fig.canvas.mpl_connect('button_press_event', self.click_handler.onclick)
         plt.tight_layout()
-        plt.title("Left Click: Add junction\nRight Click: Remove junction")
+        plt.title("Left Click: Add junction -- Right Click: Remove junction\nDon't remove generating junctions")
         plt.show()
         self.updated_ricepr = self.click_handler.update_ricepr()
 
