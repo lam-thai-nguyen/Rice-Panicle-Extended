@@ -35,6 +35,14 @@ class Junctions:
     def return_quaternary(self) -> list:
         return self.entries["quaternary"]
     
+    def return_junctions(self) -> list:
+        generating = self.return_generating()
+        primary = self.return_primary()
+        secondary = self.return_secondary()
+        tertiary = self.return_tertiary()
+        quaternary = self.return_quaternary()
+        return generating + primary + secondary + tertiary + quaternary
+    
     def add(self, level, coord) -> None:
         """
         Args:
