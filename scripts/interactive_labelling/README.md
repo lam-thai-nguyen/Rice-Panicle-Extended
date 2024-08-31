@@ -31,7 +31,7 @@ from scripts.interactive_labelling.InteractiveLabelling import InteractiveLabell
 
 # Input
 img_path = "non-processed_ground_truth.jpg"
-save_path = "parent_directory"  # default to "data/processed"
+save_path = "parent_directory"
 
 labeler = InteractiveLabelling(img_path=img_path, save_path=save_path)  # Create an instance
 labeler.run()  # Show interactive figure, left mouse click to add, right mouse click to remove
