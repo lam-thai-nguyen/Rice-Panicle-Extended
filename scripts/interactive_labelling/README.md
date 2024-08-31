@@ -1,7 +1,12 @@
 # Module Description: interactive_labelling
 
 ```
-Most of the ground truths are not perfect. They are originally the analysis results of P-TRAP  plus the post-correction by experts. This module is used for interactive labelling. We can click on the original image to add/remove junctions, which will later be used for annotations generation.
+Most of the pre-processed ground truths are not perfect.
+
+They are originally the analysis results of P-TRAP plus the post-correction by experts. 
+
+This module is used for interactive labelling. We can click on the original image to
+add/remove junctions, which will later be used for annotations generation.
 
 @lam-thai-nguyen #Aug30-2024
 ```
