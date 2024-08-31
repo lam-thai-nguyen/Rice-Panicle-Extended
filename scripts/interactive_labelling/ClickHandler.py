@@ -6,10 +6,15 @@ from .helpers import min_distance, update_ricepr
 
 
 class ClickHandler:
-    def __init__(self, img_path, ricepr_path):
-        self.ricepr_path = ricepr_path  # .ricepr file
-        self.filename = self.ricepr_path.split("/")[-1]
-        self.species = self.ricepr_path.split("/")[-2]
+    def __init__(self, img_path, orig_ricepr, save_path):
+        """
+        img_path: path to image to display (i.e., non-processed ground truth)
+        orig_ricepr: path to original .ricepr file
+        save_path: path to updated .ricepr file's parent, names and species are generated automatically (save path)
+        """
+        self.orig_ricepr = orig_ricepr  # .ricepr file
+        self.filename = self.orig_ricepr.split("/")[-1]
+        self.species = self.orig_ricepr.split("/")[-2]
         
         self.img_path = img_path
         self.fig, self.ax = plt.subplots(figsize=(10, 9))
@@ -17,7 +22,9 @@ class ClickHandler:
         self.ax.imshow(self.img)
         self.ax.axis("off")
         
-        self.ricepr_manager = riceprManager(PATH=ricepr_path)
+        self.save_path = save_path
+        
+        self.ricepr_manager = riceprManager(PATH=orig_ricepr)
         self.junctions = self.ricepr_manager.read_ricepr()[0]
         self.generating = self.junctions.return_generating()
         self.primary = self.junctions.return_primary()
@@ -29,14 +36,14 @@ class ClickHandler:
         self.removal = list()
         self.update = {"add": [], "remove": []}
 
-    def get_update(self):
+    def get_update(self) -> dict:
         return self.update
     
     def update_ricepr(self) -> str:
         """Important function. Be cautious before calling"""
         # Step 1: Copy .ricepr file
-        src = self.ricepr_path
-        dst = f"data/processed/{self.species}/{self.filename}"
+        src = self.orig_ricepr
+        dst = f"{self.save_path}/{self.species}/{self.filename}"
         print(f"==>> ClickHandler - Creating a copy of {src}")
         shutil.copy(src, dst)
         
@@ -48,7 +55,7 @@ class ClickHandler:
         return dst
         
     
-    def onclick(self, event):
+    def onclick(self, event) -> None:
         """
         Left mouse click: Add junction
         Right mouse click: Remove junction nearest to the clicked point
@@ -71,7 +78,7 @@ class ClickHandler:
                 self.fig.canvas.draw()
                 print(f"Removed junction nearest to ({x}, {y})")
             
-    def find_nearest(self):
+    def find_nearest(self) -> None:
         """Find nearest neighbor and encode"""
         junctions = self.junctions.return_junctions()
 
@@ -114,24 +121,16 @@ class ClickHandler:
         level = None
         
         if neighbor in self.generating:
-            level = "generating"
+            level = "Generating"
         elif neighbor in self.primary:
-            level = "primary"
+            level = "Primary"
         elif neighbor in self.secondary:
-            level = "secondary"
+            level = "Seconday"
         elif neighbor in self.tertiary:
-            level = "tertiary"
+            level = "Tertiary"
         elif neighbor in self.quaternary:
-            level = "quaternary"
+            level = "Quaternary"
             
-        level2type = {
-            "generating": "Generating",
-            "primary": "Primary",
-            "secondary": "Seconday",
-            "tertiary": "Tertiary",
-            "quaternary": "Quaternary"
-        }
-        
-        code = f'<vertex id="java.awt.Point[x={x},y={y}]" x="{x}" y="{y}" type="{level2type[level]}" fixed="false" />'
+        code = f'<vertex id="java.awt.Point[x={x},y={y}]" x="{x}" y="{y}" type="{level}" fixed="false" />'
         self.update["remove"].append(code)
         

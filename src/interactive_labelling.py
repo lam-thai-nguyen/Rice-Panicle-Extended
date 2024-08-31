@@ -14,9 +14,9 @@ from scripts.generate_annotations.riceprManager import riceprManager
 from scripts.interactive_labelling.InteractiveLabelling import InteractiveLabelling
 
 
-def interactive_labelling(img_path):
+def interactive_labelling(img_path, save_path="data/processed"):
     # Step 1: Create instance
-    labeler = InteractiveLabelling(img_path=img_path)
+    labeler = InteractiveLabelling(img_path=img_path, save_path=save_path)
 
     # Step 2: Interactive Labeling
     labeler.run()
