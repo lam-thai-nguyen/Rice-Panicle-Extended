@@ -45,14 +45,16 @@ if __name__ == "__main__":
 
     # African
     for filename in os.listdir(root_dir_african):
-        if filename.endswith(".jpg"):
+        if filename.endswith(".jpg") and not filename.startswith("[done]"):
             img_path = f"{root_dir_african}/{filename}"
             interactive_labelling(img_path)
             # show_update_img(img_path)
+            print("".center(50, "="))
 
     # Asian
     for filename in os.listdir(root_dir_asian):
-        if filename.endswith(".jpg"):
+        if filename.endswith(".jpg") and not filename.startswith("[done]"):
             img_path = f"{root_dir_asian}/{filename}"
             interactive_labelling(img_path)
             # show_update_img(img_path)
+            print("".center(50, "="))

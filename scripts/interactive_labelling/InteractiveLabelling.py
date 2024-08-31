@@ -21,7 +21,8 @@ class InteractiveLabelling:
         self.updated_ricepr = None  # Generated updated .ricepr file, with species and name
         
     def run(self) -> None:
-        cid = self.click_handler.fig.canvas.mpl_connect('button_press_event', self.click_handler.onclick)
+        cid_click = self.click_handler.fig.canvas.mpl_connect('button_press_event', self.click_handler.onclick)
+        cid_close = self.click_handler.fig.canvas.mpl_connect('close_event', self.click_handler.on_close)
         plt.title("Left Click: Add junction -- Right Click: Remove junction\nDon't remove generating junctions")
         plt.tight_layout()
         plt.show()

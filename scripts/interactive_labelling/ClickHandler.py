@@ -1,8 +1,10 @@
+import os
 import shutil
 from PIL import Image
 from matplotlib import pyplot as plt
 from ..generate_annotations.riceprManager import riceprManager
 from .helpers import min_distance, update_ricepr
+from tkinter import Tk, messagebox
 
 
 class ClickHandler:
@@ -77,6 +79,27 @@ class ClickHandler:
                 self.ax.plot(x, y, 'rx', markersize=6)  # Add red x
                 self.fig.canvas.draw()
                 print(f"Removed junction nearest to ({x}, {y})")
+                
+    def on_close(self, event) -> None:
+        """
+        Handle the close event and prompt the user to save changes.
+        """
+        root = Tk()
+        root.withdraw()
+
+        if messagebox.askyesno("Save Edits", "Do you want to save your edits before closing?\n\nImportant: You can't change the .ricepr file afterwards.\nHint: Change the image name back to original."):
+            self.save_edits()
+        root.destroy()
+
+    def save_edits(self):
+        """
+        Function to save edits (to be implemented as per requirements).
+        """
+        print("==>> ClickHandler - Saved edits")
+        # Rename non-processed ground truth image - Mark as [done]
+        src = self.img_path
+        dst = f"{self.save_path}/{self.species}/[done] {self.filename.replace('.ricepr', '.jpg')}"
+        os.rename(src, dst)
             
     def find_nearest(self) -> None:
         """Find nearest neighbor and encode"""
