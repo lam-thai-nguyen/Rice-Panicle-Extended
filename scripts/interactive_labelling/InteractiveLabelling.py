@@ -1,7 +1,11 @@
-from ..generate_annotations.riceprManager import riceprManager
-from .ClickHandler import ClickHandler
+import os
 import matplotlib.pyplot as plt
 from PIL import Image
+from tkinter import Tk, messagebox
+from ..generate_annotations.riceprManager import riceprManager
+from .ClickHandler import ClickHandler
+
+
 class InteractiveLabelling:
     def __init__(self, img_path, save_path) -> None:
         """
@@ -22,7 +26,10 @@ class InteractiveLabelling:
         
     def run(self) -> None:
         cid_click = self.click_handler.fig.canvas.mpl_connect('button_press_event', self.click_handler.onclick)
-        cid_close = self.click_handler.fig.canvas.mpl_connect('close_event', self.click_handler.on_close)
+        
+        # Uncomment this to ask users yes/no after the interactive plot
+        # cid_close = self.click_handler.fig.canvas.mpl_connect('close_event', self.click_handler.on_close)
+
         plt.title("Left Click: Add junction -- Right Click: Remove junction\nDon't remove generating junctions")
         plt.tight_layout()
         plt.show()
@@ -45,3 +52,23 @@ class InteractiveLabelling:
         plt.tight_layout()
         plt.show()
         
+        # Uncomment this to unable asking users yes/no after the updated plot
+        self.on_close()
+        
+    def on_close(self):
+        root = Tk()
+        root.withdraw()
+
+        if messagebox.askyesno("Save Edits", "Do you want to save your edits before closing?\n\nImportant: You can't change the .ricepr file afterwards.\nHint: Change the image name back to original."):
+            self.save_edits()
+        root.destroy()
+        
+    def save_edits(self):
+        """
+        Function to save edits (to be implemented as per requirements).
+        """
+        print("==>> InteractiveLabelling - Saved edits")
+        # Rename non-processed ground truth image - Mark as [done]
+        src = self.img_path
+        dst = f"{self.save_path}/{self.species}/[done] {self.filename}"
+        os.rename(src, dst)
