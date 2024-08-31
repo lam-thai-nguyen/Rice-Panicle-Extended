@@ -40,6 +40,19 @@ def show_update_img(img_path):
     
 
 if __name__ == "__main__":
-    img_path = "data/processed/African/1_2_1_1_1_DSC01251.jpg"
-    interactive_labelling(img_path)
-    # show_update_img(img_path)
+    root_dir_african = "data/processed/African"
+    root_dir_asian = "data/processed/Asian"
+
+    # African
+    for filename in os.listdir(root_dir_african):
+        if filename.endswith(".jpg"):
+            img_path = f"{root_dir_african}/{filename}"
+            interactive_labelling(img_path)
+            # show_update_img(img_path)
+
+    # Asian
+    for filename in os.listdir(root_dir_asian):
+        if filename.endswith(".jpg"):
+            img_path = f"{root_dir_asian}/{filename}"
+            interactive_labelling(img_path)
+            # show_update_img(img_path)
