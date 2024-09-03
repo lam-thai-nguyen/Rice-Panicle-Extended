@@ -43,12 +43,17 @@ if __name__ == "__main__":
     root_dir_african = "data/processed/African"
     root_dir_asian = "data/processed/Asian"
 
+    # Uncomment to show updated image
+    img_name = ""  # Change this
+    if img_name:
+        show_update_img(f"data/raw/African/{img_name}.jpg")
+        exit()
+
     # African
     for filename in os.listdir(root_dir_african):
         if filename.endswith(".jpg") and not filename.startswith("[done]"):
             img_path = f"{root_dir_african}/{filename}"
             interactive_labelling(img_path)
-            # show_update_img(img_path)
             print("".center(50, "="))
 
     # Asian
@@ -56,5 +61,4 @@ if __name__ == "__main__":
         if filename.endswith(".jpg") and not filename.startswith("[done]"):
             img_path = f"{root_dir_asian}/{filename}"
             interactive_labelling(img_path)
-            # show_update_img(img_path)
             print("".center(50, "="))
