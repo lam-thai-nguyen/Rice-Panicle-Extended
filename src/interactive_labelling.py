@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # Uncomment to show updated image
     img_name = ""  # Change this
     if img_name:
-        show_update_img(f"data/raw/African/{img_name}.jpg")
+        show_update_img(f"data/raw/Asian/{img_name}.jpg")
         exit()
 
     # African
