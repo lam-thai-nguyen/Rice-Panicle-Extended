@@ -45,7 +45,7 @@ def update_ricepr(PATH, update):
             if vertex_str == code:
                 vertices.remove(vertex)
                 
-    assert num_vertices == len(vertices.findall('vertex')), "(1) You clicked on generating junctions. (2) At least 2 clicked points have the same nearest neighbor. Thus, fewer vertices than specified were removed. Try again if needed."
+    assert num_vertices == len(vertices.findall('vertex')), "(1) You clicked on generating junctions. (2) At least 2 clicked points have the same nearest neighbor. Thus, fewer vertices than specified were removed. (3) Junctions supposed not to be removed are removed (fixed=\"true\"). Try again if needed."
 
     # Adding junctions
     for i, vertex in enumerate(update["add"]):
