@@ -28,7 +28,7 @@ if __name__ == "__main__":
     processed_asian_path = processed_path + "/Asian"
     
     remove_end_generating = False  # Change this if needed
-    save_path = "data/annotations/"  # Change this if needed
+    save_path = "test"  # Change this if needed
     
     # =============================== #
     #      Comment out if needed      #
@@ -38,11 +38,11 @@ if __name__ == "__main__":
         if original_img.endswith(".jpg"):
             name = original_img.split(".")[0]
             img_path = african_path + "/" + original_img
-            ricepr_path = african_path + f"/{name}.ricepr"
+            ricepr_path = processed_african_path + f"/{name}.ricepr"
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path=f"{save_path}/African",
+                save_path=f"{save_path}",
                 remove_end_generating=remove_end_generating
             )
             break  # Change this if needed
@@ -51,11 +51,11 @@ if __name__ == "__main__":
         if original_img.endswith(".jpg"):
             name = original_img.split(".")[0]
             img_path = asian_path + "/" + original_img
-            ricepr_path = asian_path + f"/{name}.ricepr"
+            ricepr_path = processed_asian_path + f"/{name}.ricepr"
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path=f"{save_path}/Asian",
+                save_path=f"{save_path}",
                 remove_end_generating=remove_end_generating
             )
             break  # Change this if needed
