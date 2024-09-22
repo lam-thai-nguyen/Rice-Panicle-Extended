@@ -23,7 +23,12 @@ if __name__ == "__main__":
     african_path = original_img_path + "/African"
     asian_path = original_img_path + "/Asian"
     
+    processed_path = "data/processed"
+    processed_african_path = processed_path + "/African"
+    processed_asian_path = processed_path + "/Asian"
+    
     remove_end_generating = False  # Change this if needed
+    save_path = "data/annotations/"  # Change this if needed
     
     # =============================== #
     #      Comment out if needed      #
@@ -37,7 +42,7 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/African",
+                save_path=f"{save_path}/African",
                 remove_end_generating=remove_end_generating
             )
             break  # Change this if needed
@@ -50,7 +55,7 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/Asian",
+                save_path=f"{save_path}/Asian",
                 remove_end_generating=remove_end_generating
             )
             break  # Change this if needed
