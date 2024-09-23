@@ -1,15 +1,17 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def main():
     # Data
-    x_value = [26, 30, 34, 38, 42, 46, 50, 54, 58, 62]  # bbox sizes
-    f1_train = [0.848473421, 0.885654136, 0.873199409, 0.885158937, 0.885753198, 0.874609593, 0.900506079, 0.869609715, 0.863266852, 0.873316282]
-    f1_val = [0.845634211, 0.87767041, 0.868022729, 0.878959137, 0.877188585, 0.870006221, 0.877955534, 0.857403912, 0.862295229, 0.862210912]
-    pr_train = [0.896947878, 0.925876763, 0.917608235, 0.919313418, 0.898887701, 0.89702623, 0.905514507, 0.881999959, 0.887364778, 0.886288395]
-    pr_val = [0.89052919, 0.916948804, 0.910569498, 0.91223084, 0.891140726, 0.889470199, 0.886037153, 0.866905402, 0.887213067, 0.876358497]
-    rc_train = [0.809712138, 0.85224992, 0.837028454, 0.856909858, 0.876318292, 0.856955465, 0.897882534, 0.860294364, 0.843318545, 0.862752897]
-    rc_val = [0.810363673, 0.846011246, 0.834329451, 0.852670462, 0.867533261, 0.854864273, 0.873099305, 0.851047133, 0.841783243, 0.850823148]
+    x_value = [26, 30, 34, 38, 42]  # bbox sizes
+    split_names = ['split15', 'split16', 'split17', 'split18', 'split19']
+    
+    f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = read_xlsx(split_names)
+    assert len(x_value) == len(f1_train), "Unmatched list lengths"
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
 
@@ -63,6 +65,27 @@ def main():
     plt.show()
 
 
+def read_xlsx(split_names: list):
+    f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = [], [], [], [], [], []
+    
+    for split_name in split_names:
+        train_path = f"logs/{split_name}/train/f1_score.xlsx"
+        val_path = f"logs/{split_name}/val/f1_score.xlsx"
+        
+        train_df = pd.read_excel(train_path)
+        val_df = pd.read_excel(val_path)
+        
+        f1_train.append(train_df['f1'].mean())
+        pr_train.append(train_df['precision'].mean())
+        rc_train.append(train_df['recall'].mean())
+        
+        f1_val.append(val_df['f1'].mean())
+        pr_val.append(val_df['precision'].mean())
+        rc_val.append(val_df['recall'].mean())
+        
+    return f1_train, pr_train, rc_train, f1_val, pr_val, rc_val
+    
+    
 if __name__ == "__main__":
     main()
     

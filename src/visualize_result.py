@@ -32,16 +32,16 @@ if __name__ == "__main__":
     confidence = config["confidence"]
     benchmark_image = config["benchmark_image"]
     
-    split_name = "split9"
-    run_name = ""
-    plot_loss = False
-    predict_show = True
-    mode = "train"
+    split_name = "split16"  # Change this if needed
+    run_name = ""  # Change this if needed
+    plot_loss = False  # Change this if needed
+    predict_show = True  # Change this if needed
+    mode = "train"  # Change this if needed
     conf = confidence[split_name][0] if mode == "train" else confidence[split_name][1]
-    img_name = benchmark_image["lots_of_problems"]
-    visual_mode = "side"
-    show = True
-    save_path = None
+    img_name = benchmark_image["lots_of_junctions"]  # Change this if needed
+    visual_mode = "side"  # Change this if needed
+    show = True  # Change this if needed
+    save_path = None  # Change this if needed
     
     main(
         split_name=split_name,
