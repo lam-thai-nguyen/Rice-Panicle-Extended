@@ -24,7 +24,7 @@ def compute_num_objects(split_path):
 
 
 if __name__ == "__main__":
-    split_path = "data/splits/split2"
+    split_path = "data/splits/split15"
     num_obj, obj_aver = compute_num_objects(split_path)
     print(f"==>> num_obj: {num_obj}")
     print(f"==>> obj_aver: {obj_aver:.2f}")
