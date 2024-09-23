@@ -23,7 +23,12 @@ if __name__ == "__main__":
     african_path = original_img_path + "/African"
     asian_path = original_img_path + "/Asian"
     
+    processed_path = "data/processed"
+    processed_african_path = processed_path + "/African"
+    processed_asian_path = processed_path + "/Asian"
+    
     remove_end_generating = False  # Change this if needed
+    save_path = "test"  # Change this if needed
     
     # =============================== #
     #      Comment out if needed      #
@@ -33,7 +38,7 @@ if __name__ == "__main__":
         if original_img.endswith(".jpg"):
             name = original_img.split(".")[0]
             img_path = african_path + "/" + original_img
-            ricepr_path = african_path + f"/{name}.ricepr"
+            ricepr_path = processed_african_path + f"/{name}.ricepr"
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
@@ -46,7 +51,7 @@ if __name__ == "__main__":
         if original_img.endswith(".jpg"):
             name = original_img.split(".")[0]
             img_path = asian_path + "/" + original_img
-            ricepr_path = asian_path + f"/{name}.ricepr"
+            ricepr_path = processed_asian_path + f"/{name}.ricepr"
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,

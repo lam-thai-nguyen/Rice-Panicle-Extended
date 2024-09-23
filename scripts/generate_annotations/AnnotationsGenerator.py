@@ -26,7 +26,7 @@ class AnnotationsGenerator:
         self.name = self.ricepr_manager.name
         self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
-        self.bbox_size = 42  # Change this if needed
+        self.bbox_size = 26  # Change this if needed
 
     def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
         if remove_end_generating and len(self.junctions.return_generating()) == 2:
