@@ -20,6 +20,9 @@ confidence: # [train conf, val conf]
   split22: [0.307, 0.307]
   split23: [0.364, 0.365]
   split24: [0.383, 0.395]
+  split25: [0.375, 0.376]
+  split26: [0.398, 0.398]
+  split27: [0.377, 0.389]
 
 benchmark_image:
   lots_of_problems: "43_2_1_1_2_DSC09658_.jpg"

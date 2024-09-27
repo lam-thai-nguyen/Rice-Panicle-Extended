@@ -7,8 +7,8 @@ import pandas as pd
 
 def main():
     # Data
-    x_value = [14, 18, 22, 26, 30, 34, 38, 42, 46, 50]  # bbox sizes
-    split_names = ['split20', 'split21', 'split22', 'split15', 'split16', 'split17', 'split18', 'split19', 'split23', 'split24']
+    x_value = [14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 58, 62]  # bbox sizes
+    split_names = ['split20', 'split21', 'split22', 'split15', 'split16', 'split17', 'split18', 'split19', 'split23', 'split24', 'split25', 'split26', 'split27']
     
     f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = read_xlsx(split_names)
     assert len(x_value) == len(f1_train), "Unmatched list lengths"
