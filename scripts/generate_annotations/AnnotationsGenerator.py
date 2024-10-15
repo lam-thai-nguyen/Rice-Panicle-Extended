@@ -28,10 +28,7 @@ class AnnotationsGenerator:
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
         self.bbox_size = 26  # Change this if needed
 
-    def draw_junctions(self, save_path=None, show=False, remove_end_generating=False):
-        if remove_end_generating and len(self.junctions.return_generating()) == 2:
-            self.junctions.remove_end_generating()
-        
+    def draw_junctions(self, save_path=None, show=False):
         generating = self.junctions.return_generating()
         primary = self.junctions.return_primary()
         secondary = self.junctions.return_secondary()
@@ -53,13 +50,10 @@ class AnnotationsGenerator:
             print(f"==>> Saving {save_path}")
             cv2.imwrite(save_path, img_copy)
             
-    def encode_junctions(self, save_path=None, remove_end_generating=False):
+    def encode_junctions(self, save_path=None):
         """
         Encode the junction bounding boxes as (class_label, x, y, w, h), all relative to the whole image
         """
-        if remove_end_generating and len(self.junctions.return_generating()) == 2:
-            self.junctions.remove_end_generating()
-
         generating = self.junctions.return_generating()
         primary = self.junctions.return_primary()
         secondary = self.junctions.return_secondary()
@@ -253,9 +247,9 @@ def test():
     img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
     ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
     annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    annotations_generator.draw_junctions(show=True, remove_end_generating=True)
+    annotations_generator.draw_junctions(show=True)
     annotations_generator.draw_grains(show=True)
-    annotations_generator.encode_junctions(save_path=".", remove_end_generating=False)
+    annotations_generator.encode_junctions(save_path=".")
     os.remove("10_2_1_1_1_DSC01291_junctions.txt")
     annotations_generator.encode_grains(save_path=".")
     os.remove("10_2_1_1_1_DSC01291_grains.txt")
