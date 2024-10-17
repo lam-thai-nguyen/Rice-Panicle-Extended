@@ -2,7 +2,7 @@ import os
 from ..generate_annotations.AnnotationsGenerator import AnnotationsGenerator
 
 
-def junctions2img(img_path: str, ricepr_path: str, save_path: str, remove_end_generating: bool = False):
+def junctions2img(img_path: str, ricepr_path: str, bbox_size: int, oriented: bool, save_path: str):
     """
     A utils function to interact with *generate_annotations* module
     
@@ -12,10 +12,9 @@ def junctions2img(img_path: str, ricepr_path: str, save_path: str, remove_end_ge
         img_path (str): original image path
         ricepr_path (str): .ricepr path
         save_path (str): the parent dir. (file name will be img_name_junctions.jpg)
-        remove_end_generating (bool, optional): Defaults to False.
     """
-    generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    generator.draw_junctions(save_path=save_path, remove_end_generating=remove_end_generating)
+    generator = AnnotationsGenerator(img_path, ricepr_path, bbox_size)
+    generator.draw_junctions(save_path, oriented=oriented)
     
     
 if __name__ == "__main__":
@@ -42,8 +41,9 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/African",
-                remove_end_generating=remove_end_generating
+                bbox_size=26,  # Change this if needed
+                oriented=True,  # Change this if needed
+                save_path="data/annotations/African/oriented",  # Change this if needed
             )
             break  # Comment out if needed
     
@@ -55,8 +55,9 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path="data/annotations/Asian",
-                remove_end_generating=remove_end_generating
+                bbox_size=26,  # Change this if needed
+                oriented=True,  # Change this if needed
+                save_path="data/annotations/Asian/oriented",  # Change this if needed
             )
             break  # Comment out if needed
             
