@@ -1,11 +1,13 @@
 import os
+import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from .riceprManager import riceprManager
+from .OrientedBox import OrientedBox
 
 
 class AnnotationsGenerator:
-    def __init__(self, img_path, ricepr_path):
+    def __init__(self, img_path, ricepr_path, bbox_size=None):
         """
         Create an Annotations Generator for .ricepr files.
 
@@ -13,8 +15,6 @@ class AnnotationsGenerator:
             img_path (str): original image path
             ricepr_path (str): .ricepr file path
         """
-        assert type(img_path) == str, "Invalid type" 
-        assert type(ricepr_path) == str, "Invalid type" 
         assert img_path.split("/")[-1].split(".")[-1].lower() == "jpg", "The given path is not an image"
         assert ricepr_path.split("/")[-1].split(".")[-1].lower() == "ricepr", "The given path is not a .ricepr file"
         assert img_path.split("/")[-1].split(".")[0] == ricepr_path.split("/")[-1].split(".")[0], "Unmatched image and .ricepr file"
@@ -26,21 +26,26 @@ class AnnotationsGenerator:
         self.name = self.ricepr_manager.name
         self.species = self.ricepr_manager.species
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
-        self.bbox_size = 26  # Change this if needed
+        self.bbox_size = 26 if bbox_size is None else bbox_size
 
-    def draw_junctions(self, save_path=None, show=False):
-        generating = self.junctions.return_generating()
-        primary = self.junctions.return_primary()
-        secondary = self.junctions.return_secondary()
-        tertiary = self.junctions.return_tertiary()
-        quaternary = self.junctions.return_quaternary()
-        junctions = generating + primary + secondary + tertiary + quaternary
+    def draw_junctions(self, save_path=None, show=False, oriented=False):
+        junctions = self.junctions.return_junctions()
         
         img_copy = self.img.copy()
         bbox_size = self.bbox_size
 
-        for x, y in junctions:
-            cv2.rectangle(img_copy, pt1=(x - bbox_size//2, y - bbox_size//2), pt2=(x + bbox_size//2, y + bbox_size//2), color=(0, 255, 255), thickness=2)
+        if oriented:
+            oriented_box = OrientedBox(junctions)
+            rects = oriented_box.run(width=bbox_size, height=bbox_size)
+            
+            for rect in rects:
+                obb = cv2.boxPoints(rect)
+                obb = np.intp(obb)
+                cv2.drawContours(img_copy, [obb], 0, (0, 255, 255), 2)
+            
+        else:
+            for x, y in junctions:
+                cv2.rectangle(img_copy, pt1=(x - bbox_size//2, y - bbox_size//2), pt2=(x + bbox_size//2, y + bbox_size//2), color=(0, 255, 255), thickness=2)
 
         if show:
             self._show(img_copy)
@@ -54,13 +59,7 @@ class AnnotationsGenerator:
         """
         Encode the junction bounding boxes as (class_label, x, y, w, h), all relative to the whole image
         """
-        generating = self.junctions.return_generating()
-        primary = self.junctions.return_primary()
-        secondary = self.junctions.return_secondary()
-        tertiary = self.junctions.return_tertiary()
-        quaternary = self.junctions.return_quaternary()
-        
-        junctions = generating + primary + secondary + tertiary + quaternary
+        junctions = self.junctions.return_junctions()
         
         if save_path:
             save_path = save_path + "/" + self.name + "_junctions.txt"
@@ -172,18 +171,6 @@ class AnnotationsGenerator:
             print(f"==>> Saving {save_path}")
             self._encode_box(grains, save_path, mode="grains")
     
-    def draw_junctions_grains(self):
-        pass
-    
-    def encode_junctions_grains(self):
-        pass
-    
-    def draw_primary_branches(self):
-        pass
-    
-    def encode_primary_branches(self):
-        pass
-    
     def _show(self, img):
         plt.figure(figsize=(8, 8))
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -242,20 +229,4 @@ class AnnotationsGenerator:
         xywh = (x_center, y_center, width, height)
         
         return xywh
-
-def test():
-    img_path = "data/raw/Asian/10_2_1_1_1_DSC01291.jpg"
-    ricepr_path = "data/raw/Asian/10_2_1_1_1_DSC01291.ricepr"
-    annotations_generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    annotations_generator.draw_junctions(show=True)
-    annotations_generator.draw_grains(show=True)
-    annotations_generator.encode_junctions(save_path=".")
-    os.remove("10_2_1_1_1_DSC01291_junctions.txt")
-    annotations_generator.encode_grains(save_path=".")
-    os.remove("10_2_1_1_1_DSC01291_grains.txt")
-    print("All tests passed")
-
-
-if __name__ == "__main__":
-    test()
     
