@@ -68,6 +68,64 @@ class AnnotationsGenerator:
         print(f"==>> Saving {save_path}")
         self._encode_box(junctions, save_path, mode="junctions")
             
+    
+    def _show(self, img):
+        plt.figure(figsize=(8, 8))
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.axis("off")
+        plt.tight_layout()
+        plt.show()
+    
+    def _encode_box(self, boxes, save_path, mode) -> None:
+        """
+        Args:
+            boxes (list): list of all boxes
+            save_path (str): file path
+            mode (str): "junctions" or "grains"
+        """
+        height, width, _ = self.img.shape
+        
+        if mode == "junctions":
+            with open(save_path, "w") as f:
+                for x, y in boxes:
+                    x, y = int(x) / width, int(y) / height
+                    bbox_size = self.bbox_size
+                    w, h = bbox_size / width, bbox_size / height
+                    class_label = 0
+                    f.write(f"{class_label} {x} {y} {w} {h}\n")
+                    
+        elif mode == "grains":
+            with open(save_path, "w") as f:
+                for x, y, w, h in boxes:
+                    x, y = x / width, y / height
+                    w, h = w / width, h / height
+                    class_label = 0
+                    f.write(f"{class_label} {x} {y} {w} {h}\n")
+                
+    def _xyxy2xywh(self, xyxy) -> tuple:
+        """
+        Turns a bounding box in (x1, y1, x2, y2) format into (x, y, w, h)
+        """
+        x1, y1, x2, y2 = xyxy
+        
+        # Compute the minimum and maximum coordinates
+        x_min = min(x1, x2)
+        y_min = min(y1, y2)
+        x_max = max(x1, x2)
+        y_max = max(y1, y2)
+        
+        # Compute width and height
+        width = x_max - x_min
+        height = y_max - y_min
+        
+        # Compute center coordinates
+        x_center = x_min + width / 2
+        y_center = y_min + height / 2
+    
+        xywh = (x_center, y_center, width, height)
+        
+        return xywh
+    
     def draw_grains(self, save_path=None, show=False):
         """deprecated"""
         img_copy = self.img.copy()
@@ -171,63 +229,4 @@ class AnnotationsGenerator:
             save_path = save_path + "/" + self.name + "_grains.txt"
             print(f"==>> Saving {save_path}")
             self._encode_box(grains, save_path, mode="grains")
-    
-    def _show(self, img):
-        plt.figure(figsize=(8, 8))
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        plt.axis("off")
-        plt.tight_layout()
-        plt.show()
-    
-    def _encode_box(self, boxes, save_path, mode) -> None:
-        """
-        Args:
-            boxes (list): list of all boxes
-            save_path (str): file path
-            mode (str): "junctions" or "grains"
-        """
-        assert mode in ["junctions", "grains"], "Invalid mode"
-        
-        height, width, _ = self.img.shape
-        
-        if mode == "junctions":
-            with open(save_path, "w") as f:
-                for x, y in boxes:
-                    x, y = int(x) / width, int(y) / height
-                    bbox_size = self.bbox_size
-                    w, h = bbox_size / width, bbox_size / height
-                    class_label = 0
-                    f.write(f"{class_label} {x} {y} {w} {h}\n")
-                    
-        elif mode == "grains":
-            with open(save_path, "w") as f:
-                for x, y, w, h in boxes:
-                    x, y = x / width, y / height
-                    w, h = w / width, h / height
-                    class_label = 0
-                    f.write(f"{class_label} {x} {y} {w} {h}\n")
-                
-    def _xyxy2xywh(self, xyxy) -> tuple:
-        """
-        Turns a bounding box in (x1, y1, x2, y2) format into (x, y, w, h)
-        """
-        x1, y1, x2, y2 = xyxy
-        
-        # Compute the minimum and maximum coordinates
-        x_min = min(x1, x2)
-        y_min = min(y1, y2)
-        x_max = max(x1, x2)
-        y_max = max(y1, y2)
-        
-        # Compute width and height
-        width = x_max - x_min
-        height = y_max - y_min
-        
-        # Compute center coordinates
-        x_center = x_min + width / 2
-        y_center = y_min + height / 2
-    
-        xywh = (x_center, y_center, width, height)
-        
-        return xywh
-    
+            
