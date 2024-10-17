@@ -3,11 +3,12 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from .riceprManager import riceprManager
+from .HorizontalBox import HorizontalBox
 from .OrientedBox import OrientedBox
 
 
 class AnnotationsGenerator:
-    def __init__(self, img_path, ricepr_path, bbox_size=None):
+    def __init__(self, img_path, ricepr_path, bbox_size=None) -> None:
         """
         Create an Annotations Generator for .ricepr files.
 
@@ -28,7 +29,7 @@ class AnnotationsGenerator:
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
         self.bbox_size = 26 if bbox_size is None else bbox_size
 
-    def draw_junctions(self, save_path=None, show=False, oriented=False):
+    def draw_junctions(self, save_path=None, show=False, oriented=False) -> None:
         junctions = self.junctions.return_junctions()
         
         img_copy = self.img.copy()
@@ -44,8 +45,10 @@ class AnnotationsGenerator:
                 cv2.drawContours(img_copy, [obb], 0, (0, 255, 255), 2)
             
         else:
-            for x, y in junctions:
-                cv2.rectangle(img_copy, pt1=(x - bbox_size//2, y - bbox_size//2), pt2=(x + bbox_size//2, y + bbox_size//2), color=(0, 255, 255), thickness=2)
+            horizontal_box = HorizontalBox(junctions)
+            rects = horizontal_box.run(width=bbox_size, height=bbox_size)
+            for pt1, pt2 in rects:
+                cv2.rectangle(img_copy, pt1, pt2, (0, 255, 255), 2)
 
         if show:
             self._show(img_copy)
@@ -55,18 +58,18 @@ class AnnotationsGenerator:
             print(f"==>> Saving {save_path}")
             cv2.imwrite(save_path, img_copy)
             
-    def encode_junctions(self, save_path=None):
+    def encode_junctions(self, save_path) -> None:
         """
-        Encode the junction bounding boxes as (class_label, x, y, w, h), all relative to the whole image
+        Horizontal box: (class_label, x, y, w, h), all relative to the whole image
+        Oriented box: (class_label, x, y, w, h, theta)
         """
         junctions = self.junctions.return_junctions()
-        
-        if save_path:
-            save_path = save_path + "/" + self.name + "_junctions.txt"
-            print(f"==>> Saving {save_path}")
-            self._encode_box(junctions, save_path, mode="junctions")
+        save_path = save_path + "/" + self.name + "_junctions.txt"
+        print(f"==>> Saving {save_path}")
+        self._encode_box(junctions, save_path, mode="junctions")
             
     def draw_grains(self, save_path=None, show=False):
+        """deprecated"""
         img_copy = self.img.copy()
         
         for edge in self.edges:
@@ -114,9 +117,7 @@ class AnnotationsGenerator:
             cv2.imwrite(save_path, img_copy)
     
     def encode_grains(self, save_path=None):
-        """
-        Encode the grain bounding boxes as (class_label, x, y, w, h), all relative to the whole image
-        """
+        """deprecated"""
         grains = list()
         
         for edge in self.edges:
