@@ -29,7 +29,7 @@ class AnnotationsGenerator:
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
         self.bbox_size = 26 if bbox_size is None else bbox_size
 
-    def draw_junctions(self, save_path=None, show=False, oriented=False) -> None:
+    def draw_junctions(self, save_path=None, show=False, oriented=False, oriented_method=1) -> None:
         junctions = self.junctions.return_junctions()
         
         img_copy = self.img.copy()
@@ -37,7 +37,7 @@ class AnnotationsGenerator:
 
         if oriented:
             oriented_box = OrientedBox(junctions)
-            rects = oriented_box.run(width=bbox_size, height=bbox_size)
+            rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)
             
             for rect in rects:
                 obb = cv2.boxPoints(rect)

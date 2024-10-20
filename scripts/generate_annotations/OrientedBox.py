@@ -14,9 +14,9 @@ class OrientedBox:
         self.theta = list()  
         self.rect = list()
         
-    def run(self, width, height) -> list:
+    def run(self, width, height, method: int) -> list:
         self.find_neighbor()
-        self.find_theta()
+        self.find_theta(method)
         self.find_rect(width, height)
         return self.rect
     
@@ -25,7 +25,12 @@ class OrientedBox:
             _, neighbor = self._nearest_neighbor(junction)
             self.neighbor.append(neighbor)
     
-    def find_theta(self):
+    def find_theta(self, method: int):
+        """
+        method = {1, 2}
+            - 1: box vertex lies on the line connecting 2 junctions.
+            - 2: box midline and the line connecting 2 junctions are coincident.
+        """
         for pt1, pt2 in zip(self.junctions, self.neighbor):
             x1, y1 = pt1
             x2, y2 = pt2
@@ -42,8 +47,12 @@ class OrientedBox:
             
             # Theta is the counterclockwise angle in Cartesian system, clockwise in OpenCV.
             # As the box vertex lies on the connecting line, we subtract 45. from theta to get the rotating angle
-            angle_diagonal = 45.
-            theta = angle_deg - angle_diagonal
+            if method == 1:
+                angle_diagonal = 45.
+                theta = angle_deg - angle_diagonal
+            elif method == 2:
+                theta = angle_deg
+                
             self.theta.append(theta)
             
     def find_rect(self, width, height):
