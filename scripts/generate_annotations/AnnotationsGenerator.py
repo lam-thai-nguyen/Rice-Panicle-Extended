@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from .riceprManager import riceprManager
 from .HorizontalBox import HorizontalBox
 from .OrientedBox import OrientedBox
+from .SkeletonBasedBox import SkeletonBasedBox
 
 
 class AnnotationsGenerator:
@@ -29,13 +30,33 @@ class AnnotationsGenerator:
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
         self.bbox_size = 26 if bbox_size is None else bbox_size
 
-    def draw_junctions(self, save_path=None, show=False, oriented=False, oriented_method=1) -> None:
+    def draw_junctions(self, save_path=None, show=False, skeleton_based=False, oriented_method=0) -> None:
+        """
+        oriented_method = {0, 1, 2}
+            - 0: horizontal box
+            - 1: oriented 1 (refer to ./OrientedBox.py)
+            - 2: oriented 2 (refer to ./OrientedBox.py)
+        """
         junctions = self.junctions.return_junctions()
         
         img_copy = self.img.copy()
         bbox_size = self.bbox_size
+        
+        if skeleton_based:
+            self.junctions.remove_end_generating()
+            generating = self.junctions.return_generating()
+            primary = self.junctions.return_primary()
+            main_axis_junctions = generating + primary
+            
+            skeleton_based_box = SkeletonBasedBox(
+                img_path=self.img_path,
+                binary_img_path=f"data/segmentation/{self.species}/{self.name}.jpg"
+                # NOTE: This absolute path may cause problem when function is called in different levels away from root
+            )
+            
+            junctions = skeleton_based_box.run(main_axis_junctions)
 
-        if oriented:
+        if oriented_method:
             oriented_box = OrientedBox(junctions)
             rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)
             
