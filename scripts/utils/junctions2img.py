@@ -2,7 +2,7 @@ import os
 from ..generate_annotations.AnnotationsGenerator import AnnotationsGenerator
 
 
-def junctions2img(img_path: str, ricepr_path: str, bbox_size: int, oriented: bool, save_path: str):
+def junctions2img(img_path: str, ricepr_path: str, bbox_size: int, save_path: str, skeleton_based=False, oriented_method=0):
     """
     A utils function to interact with *generate_annotations* module
     
@@ -14,7 +14,7 @@ def junctions2img(img_path: str, ricepr_path: str, bbox_size: int, oriented: boo
         save_path (str): the parent dir. (file name will be img_name_junctions.jpg)
     """
     generator = AnnotationsGenerator(img_path, ricepr_path, bbox_size)
-    generator.draw_junctions(save_path, oriented=oriented)
+    generator.draw_junctions(save_path, skeleton_based, oriented_method)
     
     
 if __name__ == "__main__":
@@ -42,8 +42,9 @@ if __name__ == "__main__":
                 img_path=img_path,
                 ricepr_path=ricepr_path,
                 bbox_size=26,  # Change this if needed
-                oriented=True,  # Change this if needed
                 save_path="data/annotations/African/oriented",  # Change this if needed
+                skeleton_based=False,
+                oriented_method=0,
             )
             break  # Comment out if needed
     
@@ -56,8 +57,9 @@ if __name__ == "__main__":
                 img_path=img_path,
                 ricepr_path=ricepr_path,
                 bbox_size=26,  # Change this if needed
-                oriented=True,  # Change this if needed
                 save_path="data/annotations/Asian/oriented",  # Change this if needed
+                skeleton_based=False,
+                oriented_method=0,
             )
             break  # Comment out if needed
             
