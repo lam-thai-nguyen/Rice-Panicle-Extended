@@ -14,7 +14,12 @@ def junctions2img(img_path: str, ricepr_path: str, bbox_size: int, save_path: st
         save_path (str): the parent dir. (file name will be img_name_junctions.jpg)
     """
     generator = AnnotationsGenerator(img_path, ricepr_path, bbox_size)
-    generator.draw_junctions(save_path, skeleton_based, oriented_method)
+    generator.generate_junctions(
+        save_path_img=save_path,
+        show=False,
+        skeleton_based=skeleton_based,
+        oriented_method=oriented_method,
+    )
     
     
 if __name__ == "__main__":
