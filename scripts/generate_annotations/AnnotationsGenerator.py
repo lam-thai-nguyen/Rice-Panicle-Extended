@@ -30,14 +30,20 @@ class AnnotationsGenerator:
         self.junctions, self.edges = self.ricepr_manager.read_ricepr()
         self.bbox_size = 26 if bbox_size is None else bbox_size
 
-    def draw_junctions(self, save_path=None, show=False, skeleton_based=False, oriented_method=0) -> None:
+    def generate_junctions(self, save_path_img=None, show=False, skeleton_based=False, oriented_method=0, save_path_txt=None) -> None:
         """
-        oriented_method = {0, 1, 2}
-            - 0: horizontal box
-            - 1: oriented 1 (refer to ./OrientedBox.py)
-            - 2: oriented 2 (refer to ./OrientedBox.py)
+        Args:
+            save_path_img: Specify if you want to save the generated image. Default to None.
+            show (bool): Show the generated image? Default to False.
+            skeleton_based (bool): Use the junctions from the APSIPA pipeline. Default to False.
+            oriented_method = {0, 1, 2}
+                0: horizontal box
+                1: oriented 1 (refer to ./OrientedBox.py)
+                2: oriented 2 (refer to ./OrientedBox.py)
+            save_path_txt: Specify if you want to ENCODE and save to .txt file. Default to None.
         """
         junctions = self.junctions.return_junctions()
+        boxes = list()
         
         img_copy = self.img.copy()
         bbox_size = self.bbox_size
@@ -58,97 +64,134 @@ class AnnotationsGenerator:
 
         if oriented_method:
             oriented_box = OrientedBox(junctions)
-            rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)
+            rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)  # rects = [(center, (width, height), angle), ...]
+            boxes = rects
             
             for rect in rects:
-                obb = cv2.boxPoints(rect)
+                obb = cv2.boxPoints(rect)  # 4 corner coords
                 obb = np.intp(obb)
                 cv2.drawContours(img_copy, [obb], 0, (0, 255, 255), 2)
             
         else:
             horizontal_box = HorizontalBox(junctions)
-            rects = horizontal_box.run(width=bbox_size, height=bbox_size)
+            rects = horizontal_box.run(width=bbox_size, height=bbox_size)  # rects = [(pt1, pt2), ...]
+            boxes = junctions
             for pt1, pt2 in rects:
                 cv2.rectangle(img_copy, pt1, pt2, (0, 255, 255), 2)
-
+                
         if show:
             self._show(img_copy)
             
-        if save_path:
-            save_path = save_path + "/" + self.name + "_junctions.jpg"
-            print(f"==>> Saving {save_path}")
-            cv2.imwrite(save_path, img_copy)
+        if save_path_img:
+            save_path_img = save_path_img + "/" + self.name + "_junctions.jpg"
+            print(f"==>> Saving {save_path_img}")
+            cv2.imwrite(save_path_img, img_copy)
             
-    def encode_junctions(self, save_path) -> None:
+        if save_path_txt:
+            print("==>> Encoding junctions")
+            self.encode_junctions(boxes, save_path_txt, oriented_method)
+            
+    def encode_junctions(self, boxes, save_path, method) -> None:
         """
-        Horizontal box: (class_label, x, y, w, h), all relative to the whole image
-        Oriented box: (class_label, x, y, w, h, theta)
+        Args:
+            boxes (list)
+                HBB: [(x, y), ...]
+                OBB: [(x, y, w, h, r), ...]
+            method (int): 0: "HBB" or 1: "OBBv1" or 2: "OBBv2"
+            save_path (str): file path
+        
+        Results:
+            Horizontal box: (class_index x y w h), normalized between 0 and 1
+            Oriented box: (class_index x1 y1 x2 y2 x3 y3 x4 y4), normalized between 0 and 1
+            
+        Encoding convention references:
+            general convention: https://docs.ultralytics.com/datasets/obb/
+            point-based OBB convention: https://github.com/orgs/ultralytics/discussions/8462#discussioncomment-9258090
+            
+        Expected encoding format:
+            x1, y1, x4, y4 = topmost corner, leftmost corner
+            l1 = x1 - x4
+            l2 = y4 - y1
+            if (l1 < l2) ==Point-based OBB==>> (x1 y1 x2 y2 x3 y3 x4 y4)  # clockwise from topmost
+            if (l2 > l1) ==Point-based OBB==>> (x4 y4 x1 y1 x2 y2 x3 y3)  # clockwise from leftmost
+            
+            Refer to this image: https://github.com/ultralytics/docs/releases/download/0/obb-format-examples.avif
         """
-        junctions = self.junctions.return_junctions()
         save_path = save_path + "/" + self.name + "_junctions.txt"
         print(f"==>> Saving {save_path}")
-        self._encode_box(junctions, save_path, mode="junctions")
+
+        # Encoding functions
+        def xywhr2xyxyxyxy(boxes: list) -> list:
+            xyxyxyxy = list()
+
+            for xywhr in boxes:
+                obb = cv2.boxPoints(xywhr)  # 4 corner coords (clockwise starting with leftmost corner)
+                obb = obb.tolist()
+
+                (x1, y1), (x4, y4) = obb[1], obb[0]
+                l1 = x1 - x4
+                l2 = y4 - y1
+                
+                if l1 <= l2:
+                    # Change the order of obb: starting from topmost corner
+                    obb = obb[1:] + obb[0:1]
+                else:
+                    # Keep the order: starting from leftmost
+                    pass
+                
+                # Flatten the representation
+                obb = [coord for coords in obb for coord in coords]
+                
+                xyxyxyxy.append(tuple(obb))
+
+            return xyxyxyxy
             
-    
+        def normalize(xyxyxyxy: list, img_width, img_height) -> list:
+            num_entry = 8
+            coords = [float(i) for i in xyxyxyxy]
+            normalized_coords = [
+                coords[i] / img_width if i % 2 == 0 else coords[i] / img_height for i in range(num_entry)
+            ]
+            formatted_coords = [f"{coord:.6g}" for coord in normalized_coords]
+
+            return formatted_coords
+            
+        # Encoding
+        height, width, _ = self.img.shape
+        
+        if method == 0:
+            with open(save_path, "w") as f:
+                for x, y in boxes:
+                    x, y = int(x) / width, int(y) / height
+                    bbox_size = self.bbox_size
+                    w, h = bbox_size / width, bbox_size / height
+                    class_index = 0
+                    f.write(f"{class_index} {x} {y} {w} {h}\n")
+                    
+        elif method == 1:
+            with open(save_path, "w") as f:
+                for x1, y1, x2, y2, x3, y3, x4, y4 in xywhr2xyxyxyxy(boxes):
+                    x1, y1, x2, y2, x3, y3, x4, y4 = normalize([x1, y1, x2, y2, x3, y3, x4, y4], width, height)
+                    class_index = 0
+                    f.write(f"{class_index} {x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}\n")
+            
+        elif method == 2:
+            with open(save_path, "w") as f:
+                for x1, y1, x2, y2, x3, y3, x4, y4 in xywhr2xyxyxyxy(boxes):
+                    x1, y1, x2, y2, x3, y3, x4, y4 = normalize([x1, y1, x2, y2, x3, y3, x4, y4], width, height)
+                    class_index = 0
+                    f.write(f"{class_index} {x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}\n")
+
     def _show(self, img):
+        """util function"""
         plt.figure(figsize=(8, 8))
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         plt.axis("off")
         plt.tight_layout()
         plt.show()
     
-    def _encode_box(self, boxes, save_path, mode) -> None:
-        """
-        Args:
-            boxes (list): list of all boxes
-            save_path (str): file path
-            mode (str): "junctions" or "grains"
-        """
-        height, width, _ = self.img.shape
-        
-        if mode == "junctions":
-            with open(save_path, "w") as f:
-                for x, y in boxes:
-                    x, y = int(x) / width, int(y) / height
-                    bbox_size = self.bbox_size
-                    w, h = bbox_size / width, bbox_size / height
-                    class_label = 0
-                    f.write(f"{class_label} {x} {y} {w} {h}\n")
-                    
-        elif mode == "grains":
-            with open(save_path, "w") as f:
-                for x, y, w, h in boxes:
-                    x, y = x / width, y / height
-                    w, h = w / width, h / height
-                    class_label = 0
-                    f.write(f"{class_label} {x} {y} {w} {h}\n")
-                
-    def _xyxy2xywh(self, xyxy) -> tuple:
-        """
-        Turns a bounding box in (x1, y1, x2, y2) format into (x, y, w, h)
-        """
-        x1, y1, x2, y2 = xyxy
-        
-        # Compute the minimum and maximum coordinates
-        x_min = min(x1, x2)
-        y_min = min(y1, y2)
-        x_max = max(x1, x2)
-        y_max = max(y1, y2)
-        
-        # Compute width and height
-        width = x_max - x_min
-        height = y_max - y_min
-        
-        # Compute center coordinates
-        x_center = x_min + width / 2
-        y_center = y_min + height / 2
-    
-        xywh = (x_center, y_center, width, height)
-        
-        return xywh
-    
     def draw_grains(self, save_path=None, show=False):
-        """deprecated"""
+        # NOTE: DEPRECATED
         img_copy = self.img.copy()
         
         for edge in self.edges:
@@ -196,7 +239,7 @@ class AnnotationsGenerator:
             cv2.imwrite(save_path, img_copy)
     
     def encode_grains(self, save_path=None):
-        """deprecated"""
+        # NOTE: DEPRECATED
         grains = list()
         
         for edge in self.edges:
@@ -250,4 +293,29 @@ class AnnotationsGenerator:
             save_path = save_path + "/" + self.name + "_grains.txt"
             print(f"==>> Saving {save_path}")
             self._encode_box(grains, save_path, mode="grains")
-            
+                
+    def _xyxy2xywh(self, xyxy) -> tuple:
+        # NOTE: DEPRECATED
+        """
+        Turns a bounding box in (x1, y1, x2, y2) format into (x, y, w, h)
+        """
+        x1, y1, x2, y2 = xyxy
+        
+        # Compute the minimum and maximum coordinates
+        x_min = min(x1, x2)
+        y_min = min(y1, y2)
+        x_max = max(x1, x2)
+        y_max = max(y1, y2)
+        
+        # Compute width and height
+        width = x_max - x_min
+        height = y_max - y_min
+        
+        # Compute center coordinates
+        x_center = x_min + width / 2
+        y_center = y_min + height / 2
+
+        xywh = (x_center, y_center, width, height)
+        
+        return xywh
+    
