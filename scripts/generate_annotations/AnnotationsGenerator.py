@@ -166,7 +166,7 @@ class AnnotationsGenerator:
                     bbox_size = self.bbox_size
                     w, h = bbox_size / width, bbox_size / height
                     class_index = 0
-                    f.write(f"{class_index} {x} {y} {w} {h}\n")
+                    f.write(f"{class_index} {x:.6g} {y:.6g} {w:.6g} {h:.6g}\n")
                     
         elif method == 1:
             with open(save_path, "w") as f:
