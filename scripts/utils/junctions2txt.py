@@ -2,7 +2,7 @@ import os
 from ..generate_annotations.AnnotationsGenerator import AnnotationsGenerator
 
 
-def junctions2txt(img_path: str, ricepr_path: str, save_path: str, remove_end_generating: bool = False):
+def junctions2txt(img_path: str, ricepr_path: str, bbox_size:int, save_path_txt: str, skeleton_based=False, oriented_method=0):
     """
     A utils function to interact with *generate_annotations* module
     
@@ -14,8 +14,14 @@ def junctions2txt(img_path: str, ricepr_path: str, save_path: str, remove_end_ge
         save_path (str): the parent dir. (file name will be img_name_junctions.txt)
         remove_end_generating (bool, optional): Defaults to False.
     """
-    generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path)
-    generator.encode_junctions(save_path=save_path, remove_end_generating=remove_end_generating)
+    generator = AnnotationsGenerator(img_path=img_path, ricepr_path=ricepr_path, bbox_size=bbox_size)
+    generator.generate_junctions(
+        save_path_img=None,
+        show=False,
+        skeleton_based=skeleton_based,
+        oriented_method=oriented_method,
+        save_path_txt=save_path_txt,
+    )
     
     
 if __name__ == "__main__":
@@ -27,7 +33,6 @@ if __name__ == "__main__":
     processed_african_path = processed_path + "/African"
     processed_asian_path = processed_path + "/Asian"
     
-    remove_end_generating = False  # Change this if needed
     save_path = "test"  # Change this if needed
     
     # =============================== #
@@ -42,8 +47,10 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path=f"{save_path}",
-                remove_end_generating=remove_end_generating
+                bbox_size=26,
+                save_path_txt=f".",
+                skeleton_based=False,
+                oriented_method=0,
             )
             break  # Change this if needed
     
@@ -55,8 +62,10 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                save_path=f"{save_path}",
-                remove_end_generating=remove_end_generating
+                bbox_size=26,
+                save_path_txt=f".",
+                skeleton_based=False,
+                oriented_method=2,
             )
             break  # Change this if needed
             

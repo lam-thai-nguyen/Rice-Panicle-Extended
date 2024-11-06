@@ -31,7 +31,6 @@ if __name__ == "__main__":
     processed_african_path = processed_path + "/African"
     processed_asian_path = processed_path + "/Asian"
     
-    remove_end_generating = False  # Change this if needed
     save_path = "test"  # Change this if needed
     
     # =============================== #
