@@ -41,11 +41,3 @@ def plot_loss(csv_file, save_path):
     plt.close('all')
     print(f"==>> Saving {save_path}")
     
-
-if __name__ == '__main__':
-    split_name = 'split1'  # Change this if needed
-    path = f'logs/{split_name}/train'
-    csv_file = f'{path}/results.csv'
-    save_path = f'{path}/results.png'
-    plot_loss(csv_file, save_path)
-    
