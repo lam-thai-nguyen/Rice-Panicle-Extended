@@ -28,8 +28,8 @@ def predict_show(img_path, checkpoint, conf):
     # Plotting config.
     pred_img = result.plot(
         line_width=2,
-        # conf=True,
-        # labels=True,
+        conf=False,
+        labels=False,
         # font_size=10.,
     )
     
@@ -42,4 +42,3 @@ def predict_show(img_path, checkpoint, conf):
     plt.tight_layout()
     plt.title(f"{flag} | {num_pred} junctions")
     plt.show()
-    
