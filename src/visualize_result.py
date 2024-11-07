@@ -32,7 +32,7 @@ if __name__ == "__main__":
     predict_show = True
     
     # Keyword Arguments (Change if static)
-    split_name = "split1"  # static
+    split_name = "split2"  # static
     
     img_name = benchmark_image["lots_of_junctions"]  # or species/name.jpg
     img_path = f"data/raw/{img_name}"
