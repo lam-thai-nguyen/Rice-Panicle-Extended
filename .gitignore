@@ -4,6 +4,6 @@ checkpoints/
 data/
 logs/
 archive/
-test/
+buffer/
 requirements.txt
 README.md
