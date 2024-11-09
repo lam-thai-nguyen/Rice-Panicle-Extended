@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def main():
+def plot_optimal_bbox():
     # Data
     x_value = [14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 58, 62]  # bbox sizes
     split_names = ['split20', 'split21', 'split22', 'split15', 'split16', 'split17', 'split18', 'split19', 'split23', 'split24', 'split25', 'split26', 'split27']
@@ -86,6 +86,57 @@ def read_xlsx(split_names: list):
     return f1_train, pr_train, rc_train, f1_val, pr_val, rc_val
     
     
+def plot_fixed_bbox_comparison(fixed_bbox_size: int):
+    # Hard-coded HYPERPARAMETERS
+    bbox_versions = ['HBB', 'OBBv1', 'OBBv2']
+    split_names = ['split1', 'split2', 'split3']
+    
+    # Retrieve metrics
+    f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = read_xlsx(split_names)
+    
+    # Define colors for each metric
+    metric_colors = {'F1': 'tomato', 'Precision': 'mediumseagreen', 'Recall': 'royalblue'}
+    metric_labels = ['F1', 'Precision', 'Recall']
+    
+    # Define x-axis positions for each subject
+    x_values = range(len(bbox_versions))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+    ax1.set_title("Training metrics")
+    ax2.set_title("Evaluation metrics")
+
+    def subplot_metrics(ax, f1, pr, rc):
+        for i, (f1, pr, rc) in enumerate(zip(f1, pr, rc)):
+            # Plot each metric as a separate point on the same vertical line
+            metrics = [f1, pr, rc]
+            offsets = [-0.1, 0, 0.1]  # Slight horizontal offsets for clarity
+
+            for j, (metric, label) in enumerate(zip(metrics, metric_labels)):
+                ax.plot(x_values[i] + offsets[j], metric, marker='o', markersize=8, color=metric_colors[label], label=label if i == 0 else "")
+                ax.annotate(f'{metric:.4f}', (x_values[i] + offsets[j], metric), textcoords="offset points", xytext=(0, 10), ha='center')
+
+            # Connect metrics with a vertical line for each subject
+            ax.plot([x_values[i] + offset for offset in offsets], metrics, color='gray', linestyle='--', linewidth=1)
+        
+        # Set x-axis properties
+        ax.set_xticks(x_values)
+        ax.set_xticklabels(bbox_versions)
+        ax.set_xlim(-0.5, len(bbox_versions) - 0.5)
+        ax.set_ylim(0.8, 1.0)
+        ax.set_ylabel("Metric Value")
+
+        # Add grid
+        ax.grid(True, linestyle="--")
+        
+    subplot_metrics(ax1, f1_train, pr_train, rc_train)
+    subplot_metrics(ax2, f1_val, pr_val, rc_val)
+
+    fig.suptitle(f"Comparison of Metrics for HBB, OBBv1, OBBv2 at BB Size {fixed_bbox_size}")
+    fig.legend(metric_labels, title="Metrics")
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
-    main()
+    plot_fixed_bbox_comparison(30)
     
