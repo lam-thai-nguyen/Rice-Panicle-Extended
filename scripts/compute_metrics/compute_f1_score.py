@@ -1,91 +1,169 @@
 import os
 import torch
-from ultralytics import YOLOv10
+from PIL import Image
+from ultralytics import YOLO
 import pandas as pd
 from tqdm import tqdm
+from shapely.geometry import Polygon
 
 
-def compute_f1_score(img_path, checkpoint, conf, iou_threshold):
+def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> tuple[float, float, float]:
     """
     Method: If the IoU between the predicted and true junctions is greater than a threshold, it is a true positive.
     
     Args:
         img_path (str): image path
+        label_path (str): .txt file path
         checkpoint (str): checkpoint path
         conf (float): confidence cutoff
         iou_threshold (float): IoU threshold
     Returns:
         (tuple): f1, precision, recall
     """
-    # ================= #
-    #   Retrieve info   #
-    # ================= #
-    img_name = img_path.split("/")[-1].split(".")[0]
+    # Load model and get task
+    model = YOLO(checkpoint)
     
-    original_folder = "data/raw"
-    annotations_folder = "data/annotations"
+    if model.task == "detect":
+        flag = "HBB"
+    elif model.task == "obb":
+        flag = "OBB"
+        # NOTE: FYI, result.obb.xywhr has rotation angle in radian, within [-pi, pi]. 
+        # Answered by Glenn Jocher at https://github.com/ultralytics/ultralytics/issues/15677#issuecomment-2295746033.
+    else:
+        raise Exception("Unexpected YOLO model's task.")
     
-    if os.path.exists(f"{original_folder}/African/{img_name}.jpg"):  # If this is an African rice panicle
-        label_txt = f"{annotations_folder}/African/{img_name}_junctions.txt"
-    else:  # If this is an Asian rice panicle
-        label_txt = f"{annotations_folder}/Asian/{img_name}_junctions.txt"
+    # Functions with behaviors based on flags
+    def get_GT(flag, label_path) -> tuple[torch.Tensor, int]:
+        width, height = Image.open(img_path).size
+        
+        if flag == "HBB":
+            xywhn_GT = list()
+            with open(label_path, "r") as f:
+                lines = f.readlines()
+                for line in lines:
+                    info = line.split(" ")
+                    x, y, w, h = float(info[1]), float(info[2]), float(info[3]), float(info[4])
+                    xywhn_GT.append([x, y, w, h])
+            
+            xywhn_GT = torch.tensor(xywhn_GT)
+            num_GT = xywhn_GT.size()[0]  # Number of GT junctions
+            xywh_GT = xywhn_GT * torch.tensor([width, height, width, height])
+            GT = tuple([xywh_GT, num_GT])
+        else:
+            xyxyxyxyn_GT = list()
+            with open(label_path, "r") as f:
+                lines = f.readlines()
+                for line in lines:
+                    info = line.split(" ")
+                    x1, y1 = float(info[1]), float(info[2])
+                    x2, y2 = float(info[3]), float(info[4])
+                    x3, y3 = float(info[5]), float(info[6])
+                    x4, y4 = float(info[7]), float(info[8])
+                    xyxyxyxyn_GT.append([x1, y1, x2, y2, x3, y3, x4, y4])
+            
+            xyxyxyxyn_GT = torch.tensor(xyxyxyxyn_GT)
+            num_GT = xyxyxyxyn_GT.size()[0]  # Number of GT junctions
+            xyxyxyxy_GT = xyxyxyxyn_GT * torch.tensor([width, height, width, height, width, height, width, height])
+            GT = tuple([xyxyxyxy_GT, num_GT])
+            
+        return GT
+            
+    def get_det(flag) -> tuple[torch.Tensor, int]:
+        results = model.predict(source=img_path, conf=conf)
+        if flag == "HBB":
+            boxes = results[0].boxes
+            xywh_det = boxes.xywh  
+            num_det = xywh_det.size()[0]  # Number of detected junctions
+            det = tuple([xywh_det, num_det])
+        else:
+            obb = results[0].obb
+            xyxyxyxy_det = obb.xyxyxyxy
+            xyxyxyxy_det = torch.flatten(xyxyxyxy_det, start_dim=1, end_dim=-1)  # (num_det, num_obb, num_coord) -> (num_det, num_obb*num_coord)
+            num_det = xyxyxyxy_det.size()[0]  # Number of detected junctions
+            det = tuple([xyxyxyxy_det, num_det])
+            
+        return det
+        
+    def get_IOU(flag, box1, box2):
+        if flag == "HBB":
+            """Box format: (x, y, w, h) -> absolute values, not normalized"""
+            x1, y1, w1, h1 = box1
+            x2, y2, w2, h2 = box2
+            
+            # Get intersection corners
+            xi1 = max(x1, x2)
+            yi1 = max(y1, y2)
+            xi2 = min(x1 + w1, x2 + w2)
+            yi2 = min(y1 + h1, y2 + h2)
+            
+            # Compute IOU
+            inter_area = max(0, xi2 - xi1) * max(0, yi2 - yi1)
+            box1_area = w1 * h1
+            box2_area = w2 * h2
+            union_area = box1_area + box2_area - inter_area
+            IOU = inter_area / union_area
+        else:
+            """Box format: (x1, y1, x2, y2, x3, y3, x4, y4) -> absolute values, not normalized"""
+            # Create Polygon()
+            poly1 = Polygon([(box1[0], box1[1]), (box1[2], box1[3]), (box1[4], box1[5]), (box1[6], box1[7])])
+            poly2 = Polygon([(box2[0], box2[1]), (box2[2], box2[3]), (box2[4], box2[5]), (box2[6], box2[7])])
+            
+            # Compute IOU
+            inter_area = poly1.intersection(poly2).area
+            union_area = poly1.area + poly2.area - inter_area
+            IOU = inter_area / union_area
+            
+        return IOU
+        
+    def get_IOU_matrix(flag, det, GT):
+        """Row represents detected boxes, column represents GT boxes"""
+        num_det = det.size()[0]
+        num_GT = GT.size()[0]
+        iou_matrix = torch.zeros((num_det, num_GT))
+        
+        for i in range(num_det):
+            for j in range(num_GT):
+                iou_matrix[i, j] = get_IOU(flag, det[i], GT[j])
+        
+        return iou_matrix
+
+    # Retrieving ground truth (GT) and detection (det)
+    GT, num_GT = get_GT(flag, label_path)
+    det, num_det = get_det(flag)
     
-    xywhn_true = []  # We can only get the normalized coordinates of the true junctions
-    with open(label_txt, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            info = line.split(" ")
-            x, y, w, h = float(info[1]), float(info[2]), float(info[3]), float(info[4])
-            xywhn_true.append([x, y, w, h])
+    # ========================================================================================================================= #
+    #   Computing F1, Pr, Rc                                                                                                    #
+    #                                                                                                                           #
+    #   Motivation (Idea explanation):                                                                                          #
+    #       - We create a matrix of IoU between the *detected* and *true* junctions.                                            #
+    #       - We count up the TP by 1 if argmax(*detected*) is true and argmax(*true*) is *detected*                            #
+    #           (because sometimes multiple detections can have high IoU with the same *true* box)                              #
+    #       - *Detected* bounding boxes whose IoU with a matched *true* box is high but couldn't find a match is counted as FP  #
+    # ========================================================================================================================= #
     
-    xywhn_true = torch.tensor(xywhn_true)
-    num_true = xywhn_true.size()[0]  # Number of true junctions
-    
-    # ================= #
-    #     Inference     # 
-    # ================= #
-    model = YOLOv10(checkpoint)
-    results = model.predict(source=img_path, conf=conf)
-    boxes = results[0].boxes
-    xywh_pred = boxes.xywh  
-    num_pred = xywh_pred.size()[0]  # Number of predicted junctions
-    
-    # Get xywh as exact coordinates in the image
-    height, width = boxes.orig_shape
-    xywh_true = xywhn_true * torch.tensor([width, height, width, height])
-    
-    # ===================================================================================================================== #
-    #   Evaluation                                                                                                          #
-    #                                                                                                                       #
-    #   Explanation:                                                                                                        #
-    #       - We create a matrix of IoU between the predicted and true junctions.                                           #
-    #       - We count up the TP by 1 if argmax(predicted) is true and argmax(true) is predicted                            #
-    #           (because sometimes multiple predictions can have high IoU with the same true box)                           #
-    #       - Predicted bounding boxes whose IoU with a matched true box is high but couldn't find a match is counted as FP #
-    # ===================================================================================================================== #
-    iou_matrix = _compute_iou_matrix(xywh_pred, xywh_true)  # Shape: (num_pred, num_true)
+    iou_matrix = get_IOU_matrix(flag, det, GT)  # Shape: (num_det, num_GT)
     
     TP = 0
     
-    for idx, pred_box_iou in enumerate(iou_matrix):
-        pred_box_iou[(pred_box_iou < iou_threshold)] = 0.
+    for idx, det_iou in enumerate(iou_matrix):
+        det_iou[(det_iou < iou_threshold)] = 0.  # In a row, every IOU below the threshold is zeroed.
         
         while True:
-            max_iou_idx = torch.argmax(pred_box_iou)
+            max_iou_idx = torch.argmax(det_iou)  # Get the column index where IOU is max
             
-            if pred_box_iou[max_iou_idx] == 0:
+            if det_iou[max_iou_idx] == 0:  # If the max IOU is 0, skip this detection
                 break
             
-            if torch.argmax(iou_matrix[:, max_iou_idx]) == idx:
-                TP += 1
-                iou_matrix[idx, :] = -1
-                iou_matrix[:, max_iou_idx] = -1
+            if torch.argmax(iou_matrix[:, max_iou_idx]) == idx:  # If the current column (max_iou_idx) has the current row (idx) as the max IOU
+                TP += 1  # Count this IOU as 1 True Positive
+                iou_matrix[idx, :] = -1  # Eliminate the current row (detection) from further examination
+                iou_matrix[:, max_iou_idx] = -1  # Eliminate the found column (GT) from further examination
                 break
             else:
-                pred_box_iou[max_iou_idx] = 0.
+                det_iou[max_iou_idx] = 0.
     
-    FP = num_pred - TP
-    FN = num_true - TP
+    FP = num_det - TP
+    FN = num_GT - TP
     
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
@@ -93,41 +171,6 @@ def compute_f1_score(img_path, checkpoint, conf, iou_threshold):
     
     return f1, precision, recall
 
-
-def _compute_iou(box1, box2):
-    """
-    Box format: (x, y, w, h)
-    
-    ⚠️ xywh are exact values in the image
-    """
-    x1, y1, w1, h1 = box1
-    x2, y2, w2, h2 = box2
-    
-    xi1 = max(x1, x2)
-    yi1 = max(y1, y2)
-    xi2 = min(x1 + w1, x2 + w2)
-    yi2 = min(y1 + h1, y2 + h2)
-    
-    inter_area = max(0, xi2 - xi1) * max(0, yi2 - yi1)
-    box1_area = w1 * h1
-    box2_area = w2 * h2
-    union_area = box1_area + box2_area - inter_area
-    
-    return inter_area / union_area
-
-
-def _compute_iou_matrix(pred_boxes, true_boxes):
-    """Row represents predicted boxes, column represents true boxes"""
-    num_preds = pred_boxes.size()[0]
-    num_trues = true_boxes.size()[0]
-    iou_matrix = torch.zeros((num_preds, num_trues))
-    
-    for i in range(num_preds):
-        for j in range(num_trues):
-            iou_matrix[i, j] = _compute_iou(pred_boxes[i], true_boxes[j])
-    
-    return iou_matrix
-    
 
 def save_as_excel(history, save_path):
     if os.path.exists(save_path):
@@ -141,26 +184,35 @@ if __name__ == "__main__":
     history = dict()
     save_history = True  # Change this if needed
     mode = "val"  # Change this if needed [train or val]
-    split_name = "split7"  # Change this if needed
-    run_name = ""  # Change this if needed
-    save_path = f"logs/{split_name}/{run_name}/{mode}" + "/f1_score.xlsx" if run_name else f"logs/{split_name}/{mode}" + "/f1_score.xlsx"
+    split_name = "split25"  # Change this if needed
+    save_path = f"./f1_score.xlsx"
     
-    val_folder = f"data/splits/{split_name}/{mode}/images"
-    with tqdm(os.listdir(val_folder), desc="Evaluating") as pbar:
+    images_folder = f"data/splits/{split_name}/{mode}/images"
+    labels_folder = f"data/splits/{split_name}/{mode}/labels"
+    
+    with tqdm(os.listdir(images_folder), desc="Evaluating") as pbar:
         for filename in pbar:
             # Configuration
-            img_path = f"{val_folder}/{filename}"
-            checkpoint = f"checkpoints/{split_name}/{run_name}/best.pt" if run_name else f"checkpoints/{split_name}/best.pt"
-            conf = 0.292  # Change this if needed
+            img_path = f"{images_folder}/{filename}"
+            label_path = f"{labels_folder}/{filename[:-4]}.txt"
+            checkpoint = f"checkpoints/{split_name}/best.pt"
+            
+            conf = 0.376  # Change this if needed
             # ============================================================================================================= #
             # IoU Threshold should be small because, from experience, iou != 0. means valid prediction.                     #
             # Why small iou means valid prediction? Because some true boxes were not acutely correctly labeled.             #
             # One more thing, for small object detection (SOD), small IoU doesn't necessarily mean false prediction [1].    #
             # ============================================================================================================= #
-            iou_threshold = 0.01  # Change this if needed
+            iou_threshold = 0.1  # Change this if needed
 
             # Compute metrics
-            f1, precision, recall = compute_f1_score(img_path=img_path, checkpoint=checkpoint, conf=conf, iou_threshold=iou_threshold)
+            f1, precision, recall = compute_f1_score(
+                img_path=img_path, 
+                label_path=label_path,
+                checkpoint=checkpoint, 
+                conf=conf, 
+                iou_threshold=iou_threshold
+            )
 
             # Update progression bar
             pbar.set_postfix({"F1": f"{f1:.2f}", "P": f"{precision:.2f}", "R": f"{recall:.2f}"})
