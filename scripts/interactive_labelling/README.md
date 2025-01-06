@@ -1,15 +1,11 @@
 # Module Description: interactive_labelling
 
-```
-Most of the pre-processed ground truths are not perfect.
+- Most of the pre-processed ground truths are not perfect.
 
-They are originally the analysis results of P-TRAP plus the post-correction by experts. 
+- They are originally the analysis results of P-TRAP plus the post-correction by experts. 
 
-This module is used for interactive labelling. We can click on the original image to
+- This module is used for interactive labelling. We can click on the original image to
 add/remove junctions, which will later be used for annotations generation.
-
-@lam-thai-nguyen #Aug30-2024
-```
 
 ## Motivation
 
@@ -22,7 +18,8 @@ add/remove junctions, which will later be used for annotations generation.
 ## Objective
 
 - **interactive_labelling** module allows for interactively clicking on non-processed ground truth images to (1) add and (2) remove objects (i.e., junctions).
-- After interaction, changes are saved in a copy of the adapted *.ricepr* file.
+- After interaction, changes are saved in a copy of the *.ricepr* file.
+- Images inside `../../data/processed/` will have their names marked with `[done]` to indicate changes have been saved. To re-edit/make new changes from scratch, simply omit the `[done]` from the image name and run the previous code again. 
 
 ## Usage
 
