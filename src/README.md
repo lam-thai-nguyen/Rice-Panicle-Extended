@@ -6,3 +6,4 @@
 - `visualize_result.py` is a reusable script with features from `../scripts/.visualize_predictions/`.
 - `plot_optimal_bbox.py` plots a performance comparison graph between different bbox sizes, allowing for intuitive assessment.
 - `compute_num_objects.py` computes the number of junctions in certain categories. This script is not generalized yet.
+- `duplicate_split.py` duplicates a `splitx/` and creates a new one with different labels files. 
