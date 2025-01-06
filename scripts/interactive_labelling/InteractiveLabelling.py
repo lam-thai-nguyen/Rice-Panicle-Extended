@@ -7,10 +7,11 @@ from .ClickHandler import ClickHandler
 
 
 class InteractiveLabelling:
+    """Show a UI"""
     def __init__(self, img_path, save_path) -> None:
         """
         img_path: path to image to display (i.e., non-processed ground truth)
-        save_path: path to updated .ricepr file's parent, names and species are generated automatically
+        save_path: path to updated .ricepr file, names and species are generated automatically
         """
         self.img_path = img_path
         self.filename = self.img_path.split("/")[-1]
@@ -27,9 +28,6 @@ class InteractiveLabelling:
     def run(self) -> None:
         cid_click = self.click_handler.fig.canvas.mpl_connect('button_press_event', self.click_handler.onclick)
         
-        # Uncomment this to ask users yes/no after the interactive plot
-        # cid_close = self.click_handler.fig.canvas.mpl_connect('close_event', self.click_handler.on_close)
-
         plt.title("Left Click: Add junction -- Right Click: Remove junction\nDon't remove generating junctions")
         plt.tight_layout()
         plt.show()
@@ -53,9 +51,9 @@ class InteractiveLabelling:
         plt.show()
         
         # Uncomment this to unable asking users yes/no after the updated plot
-        self.on_close()
+        self.onclose()
         
-    def on_close(self):
+    def onclose(self):
         root = Tk()
         root.withdraw()
 

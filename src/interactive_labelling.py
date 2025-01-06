@@ -43,7 +43,8 @@ if __name__ == "__main__":
     root_dir_african = "data/processed/African"
     root_dir_asian = "data/processed/Asian"
 
-    # Uncomment to show updated image
+    # Show updated image and exit
+    # Uncomment (4 lines) to use the later features
     img_name = ""  # Change this
     if img_name:
         show_update_img(f"data/raw/Asian/{img_name}.jpg")

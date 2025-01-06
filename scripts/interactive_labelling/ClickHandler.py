@@ -8,11 +8,12 @@ from tkinter import Tk, messagebox
 
 
 class ClickHandler:
+    """Determine which actions to take based on human interaction"""
     def __init__(self, img_path, orig_ricepr, save_path):
         """
         img_path: path to image to display (i.e., non-processed ground truth)
         orig_ricepr: path to original .ricepr file
-        save_path: path to updated .ricepr file's parent, names and species are generated automatically (save path)
+        save_path: path to updated .ricepr file, names and species are generated automatically
         """
         self.orig_ricepr = orig_ricepr  # .ricepr file
         self.filename = self.orig_ricepr.split("/")[-1]
@@ -56,7 +57,6 @@ class ClickHandler:
         
         return dst
         
-    
     def onclick(self, event) -> None:
         """
         Left mouse click: Add junction
@@ -79,28 +79,7 @@ class ClickHandler:
                 self.ax.plot(x, y, 'rx', markersize=6)  # Add red x
                 self.fig.canvas.draw()
                 print(f"Removed junction nearest to ({x}, {y})")
-                
-    def on_close(self, event) -> None:
-        """
-        Handle the close event and prompt the user to save changes.
-        """
-        root = Tk()
-        root.withdraw()
-
-        if messagebox.askyesno("Save Edits", "Do you want to save your edits before closing?\n\nImportant: You can't change the .ricepr file afterwards.\nHint: Change the image name back to original."):
-            self.save_edits()
-        root.destroy()
-
-    def save_edits(self):
-        """
-        Function to save edits (to be implemented as per requirements).
-        """
-        print("==>> ClickHandler - Saved edits")
-        # Rename non-processed ground truth image - Mark as [done]
-        src = self.img_path
-        dst = f"{self.save_path}/{self.species}/[done] {self.filename.replace('.ricepr', '.jpg')}"
-        os.rename(src, dst)
-            
+    
     def find_nearest(self) -> None:
         """Find nearest neighbor and encode"""
         junctions = self.junctions.return_junctions()
