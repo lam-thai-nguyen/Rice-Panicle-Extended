@@ -8,6 +8,7 @@ import math
 
 
 class OrientedBox:
+    """obb manager for an image"""
     def __init__(self, junctions: list) -> None:
         self.junctions = junctions
         self.neighbor = list()

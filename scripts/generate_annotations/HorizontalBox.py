@@ -1,4 +1,5 @@
 class HorizontalBox:
+    """hbb manager for an image"""
     def __init__(self, junctions: list) -> None:
         self.junctions = junctions
         self.rects = list()

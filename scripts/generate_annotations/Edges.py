@@ -1,4 +1,5 @@
 class Edges:
+    """an edge manager for an image"""
     num_entry = 0
     
     def __init__(self):
