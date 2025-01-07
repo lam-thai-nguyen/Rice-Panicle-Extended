@@ -12,8 +12,6 @@ class riceprManager:
         Args:
             PATH (str): .ricepr file path
         """
-        assert type(PATH) == str, "Invalid type" 
-        assert PATH.split("/")[-1].split(".")[-1].lower() == "ricepr", "The given path is not a .ricepr file"
         self.PATH = PATH
         self.name = self.PATH.split("/")[-1].split(".")[0]
         self.species = "Asian" if "Asian" in PATH else "African" if "African" in PATH else None
@@ -95,20 +93,3 @@ class riceprManager:
             edges.append(edge)
 
         return edges  
-    
-    
-def test():
-    ricepr_path = "data/raw/African/1_2_1_1_1_DSC01251.ricepr"
-    ricepr_manager = riceprManager(PATH=ricepr_path)
-    junctions, edges = ricepr_manager.read_ricepr()
-    time.sleep(2)
-    assert len(junctions.return_generating()) == 2
-    assert len(edges[0]) == 4
-    junctions.remove_end_generating()
-    assert len(junctions.return_generating()) == 1
-    print("All tests passed")
-    
-    
-if __name__ == "__main__":
-    test()
-    
