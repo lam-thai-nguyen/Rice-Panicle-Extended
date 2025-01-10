@@ -182,6 +182,58 @@ class AnnotationsGenerator:
                     class_index = 0
                     f.write(f"{class_index} {x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}\n")
 
+    def generate_grains(self):
+        grains = self.ricepr_manager.get_grains()
+        return grains
+
+    def generate_primary_branches(self):
+        assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
+        primary_branches = self.ricepr_manager.get_primary_branches()
+        return primary_branches
+
+    # NOTE: Resolve the logic problem in riceprManager.py first
+    def generate_secondary_branches(self):
+        assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
+        secondary_branches = self.ricepr_manager.get_secondary_branches()
+        return secondary_branches
+
+    def generate_vertex_edge(self, save_path) -> None:
+        """draw the vertex and edge from .ricepr file to the image, mainly for debugging purposes"""
+        img = self.img.copy()
+        terminals = self.junctions.return_terminal()
+        primary = self.junctions.return_primary()
+        secondary = self.junctions.return_secondary()
+        tertiary = self.junctions.return_tertiary()
+        generating = self.junctions.return_generating()
+        edges = self.edges
+        
+        for edge in edges:
+            x1, y1, x2, y2 = edge
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 255), 2)
+
+        for terminal in terminals:
+            x, y = terminal
+            cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+
+        for junction in primary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 255, 255), -1)
+
+        for junction in secondary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
+
+        for junction in tertiary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (0, 255, 0), -1)
+
+        for junction in generating:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 255, 0), -1)
+        
+        if save_path:
+            cv2.imwrite(f"{save_path}/{self.name}_vertex_edge.jpg", img)
+
     def _show(self, img):
         """util function"""
         plt.figure(figsize=(8, 8))
