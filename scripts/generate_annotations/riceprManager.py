@@ -157,19 +157,19 @@ class riceprManager:
             candidates = [family_tree[i] for i in range(len(family_tree)) if family_tree[i][-1] == root_node]
 
             # Classify and store inside `clusters` -> the problem is: given a nested list, find inner lists that have 2 mutual entries.
-            for i, inner1 in enumerate(candidates):  # inner1 is a list
+            for i, inner1 in enumerate(candidates):  # inner1 is an 1D list of tuples
                 # Initialize a new empty list. A cluster is composed of different paths that all end up at the same primary junction.
                 cluster = list()
                 
                 # Check if visited
                 if len(clusters) > 0:
-                    if inner1 in clusters[-1]:
+                    if inner1 in [pathway for cluster in clusters for pathway in cluster]:
                         continue
                 cluster.append(inner1)
                 
-                for inner2 in candidates[i + 1:]:  # inner2 is a list
+                for inner2 in candidates[i + 1:]:  # inner2 is an 1D list of tuples
                     if len(clusters) > 0:
-                        if inner2 in clusters[-1]:
+                        if inner2 in [pathway for cluster in clusters for pathway in cluster]:
                             continue
                     if len(set(inner1) & set(inner2)) >= 2:
                         cluster.append(inner2)
