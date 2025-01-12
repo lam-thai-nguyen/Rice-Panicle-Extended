@@ -191,6 +191,9 @@ class riceprManager:
 
             primary_branches.append([furthest_endpoint, primary_junction])
                     
+        # Format the return branches
+        primary_branches = [tuple(coordinate for coordinates in branch for coordinate in coordinates) for branch in primary_branches]
+        
         return primary_branches
         
     # NOTE: The logic here might not be correct. Needs confirmation from Stefan. Not every branch that starts with secondary junction and ends with terminal is a secondary branches
