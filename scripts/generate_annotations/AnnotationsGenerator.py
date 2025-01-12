@@ -74,7 +74,7 @@ class AnnotationsGenerator:
             
         else:
             horizontal_box = HorizontalBox(junctions)
-            rects = horizontal_box.run(width=bbox_size, height=bbox_size)  # rects = [(pt1, pt2), ...]
+            rects = horizontal_box.run_junctions(width=bbox_size, height=bbox_size)  # rects = [(pt1, pt2), ...]
             boxes = junctions
             for pt1, pt2 in rects:
                 cv2.rectangle(img_copy, pt1, pt2, (0, 255, 255), 2)
@@ -182,20 +182,63 @@ class AnnotationsGenerator:
                     class_index = 0
                     f.write(f"{class_index} {x1} {y1} {x2} {y2} {x3} {y3} {x4} {y4}\n")
 
-    def generate_grains(self):
-        grains = self.ricepr_manager.get_grains()
-        return grains
+    # TODO: Implement this function
+    def generate_branches(self, level, save_path_img=None, show=False, save_path_txt=None) -> None:
+        """
+        Generate branches for rice panicles
 
-    def generate_primary_branches(self):
-        assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
-        primary_branches = self.ricepr_manager.get_primary_branches()
-        return primary_branches
+        Args:
+            level (str): ["grains", "primary", "secondary"]
+            save_path_img (str): Save path for the generated image. Default to None.
+            show (bool): Show the generated image. Default to False.
+            save_path_txt (str): Save path for encoded txt. Default to None.
+        """
+        assert level in ["grains", "primary", "secondary"], "Invalid level"
+        img_copy = self.img.copy()
+        
+        def generate_grains():
+            grains = self.ricepr_manager.get_grains()
+            return grains
 
-    # NOTE: Resolve the logic problem in riceprManager.py first
-    def generate_secondary_branches(self):
-        assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
-        secondary_branches = self.ricepr_manager.get_secondary_branches()
-        return secondary_branches
+        def generate_primary_branches():
+            assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
+            primary_branches = self.ricepr_manager.get_primary_branches()
+            return primary_branches
+
+        # NOTE: Resolve the logic problem in riceprManager.py first
+        def generate_secondary_branches():
+            assert "processed" not in self.ricepr_path, "You have to use the original .ricepr file for this operation"
+            secondary_branches = self.ricepr_manager.get_secondary_branches()
+            return secondary_branches
+        
+        if level == "grains":
+            branches = generate_grains()
+        elif level == "primary":
+            branches = generate_primary_branches()
+        else:
+            branches = generate_secondary_branches()
+            
+        # TODO: Implement HBB for branches
+        horizontal_box = HorizontalBox(branches=branches)
+        rects = horizontal_box.run_branches()
+        for x1, y1, x2, y2 in rects:
+            cv2.rectangle(img_copy, (x1, y1), (x2, y2), (0, 255, 255), 2)
+
+        if show:
+            self._show(img_copy)
+            
+        if save_path_img:
+            save_path_img = save_path_img + "/" + self.name + "_branches.jpg"
+            print(f"==>> Saving {save_path_img}")
+            cv2.imwrite(save_path_img, img_copy)
+            
+        if save_path_txt:
+            print("==>> Encoding branches")
+            self.encode_branches()
+            
+    # TODO: Implement this function
+    def encode_branches(self):
+        ...
 
     def generate_vertex_edge(self, save_path) -> None:
         """draw the vertex and edge from .ricepr file to the image, mainly for debugging purposes"""
