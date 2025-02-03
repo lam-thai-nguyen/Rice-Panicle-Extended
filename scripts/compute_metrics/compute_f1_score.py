@@ -42,7 +42,7 @@ def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> t
                 lines = f.readlines()
                 for line in lines:
                     info = line.split(" ")
-                    x, y, w, h = float(info[1]), float(info[2]), float(info[3]), float(info[4])
+                    x, y, w, h = float(info[1]), float(info[2]), float(info[3]), float(info[4])  # x, y is center point
                     xywhn_GT.append([x, y, w, h])
             
             xywhn_GT = torch.tensor(xywhn_GT)  # Turn into a 2D Tensor of shape (num_GT, 4)
@@ -72,7 +72,7 @@ def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> t
         results = model.predict(source=img_path, conf=conf)
         if flag == "HBB":
             boxes = results[0].boxes
-            xywh_det = boxes.xywh  
+            xywh_det = boxes.xywh  # x, y is center point
             num_det = xywh_det.size()[0]  # Number of detected junctions
             det = tuple([xywh_det, num_det])
         else:
@@ -86,15 +86,21 @@ def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> t
         
     def get_IOU(flag, box1, box2):
         if flag == "HBB":
-            """Box format: (x, y, w, h) -> absolute values, not normalized"""
+            """Box format: (x_center, y_center, w, h) -> absolute values, not normalized"""
             x1, y1, w1, h1 = box1
             x2, y2, w2, h2 = box2
-            
+
+            # Convert (x_center, y_center, w, h) to (x_min, y_min, x_max, y_max)
+            x1_min, y1_min = x1 - w1 / 2, y1 - h1 / 2
+            x1_max, y1_max = x1 + w1 / 2, y1 + h1 / 2
+            x2_min, y2_min = x2 - w2 / 2, y2 - h2 / 2
+            x2_max, y2_max = x2 + w2 / 2, y2 + h2 / 2
+
             # Get intersection corners
-            xi1 = max(x1, x2)
-            yi1 = max(y1, y2)
-            xi2 = min(x1 + w1, x2 + w2)
-            yi2 = min(y1 + h1, y2 + h2)
+            xi1 = max(x1_min, x2_min)
+            yi1 = max(y1_min, y2_min)
+            xi2 = min(x1_max, x2_max)
+            yi2 = min(y1_max, y2_max)
             
             # Compute IOU
             inter_area = max(0, xi2 - xi1) * max(0, yi2 - yi1)
