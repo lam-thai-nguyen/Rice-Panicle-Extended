@@ -45,7 +45,7 @@ def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> t
                     x, y, w, h = float(info[1]), float(info[2]), float(info[3]), float(info[4])
                     xywhn_GT.append([x, y, w, h])
             
-            xywhn_GT = torch.tensor(xywhn_GT)
+            xywhn_GT = torch.tensor(xywhn_GT)  # Turn into a 2D Tensor of shape (num_GT, 4)
             num_GT = xywhn_GT.size()[0]  # Number of GT junctions
             xywh_GT = xywhn_GT * torch.tensor([width, height, width, height])
             GT = tuple([xywh_GT, num_GT])
