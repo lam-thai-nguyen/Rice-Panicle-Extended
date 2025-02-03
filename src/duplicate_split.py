@@ -10,7 +10,7 @@ def duplicate_split(src, dst):
         src (str): src split name
         dst (str): dst split name
         
-    N.B. Only run this function after the buffer is ready. The buffer is buffer/. Ready means buffer/ contains all and only labels files. 
+    N.B. Only run this function after the buffer is ready. The buffer is buffer/. Ready means buffer/ contains all and only labels files. To do that, refer to scripts/utils and run those files as modules.
     """
     os.makedirs(f"data/splits/{dst}/train/images", exist_ok=True)
     os.makedirs(f"data/splits/{dst}/train/labels", exist_ok=True)
@@ -54,6 +54,6 @@ def duplicate_split(src, dst):
         
         
 if __name__ == "__main__":
-    src = "split1"  # Change this if needed
-    dst = "split100"  # Change this if needed
+    src = "split0"  # Change this if needed
+    dst = "split1"  # Change this if needed
     duplicate_split(src, dst)
