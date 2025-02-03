@@ -61,6 +61,7 @@ def train_val_split(mode: str, root_dir: str, save_dir: str, val_size: float, ra
     return train, val
 
     
+# NOTE: instead of copying from `african_annotations_path` as before, now copying from `buffer/`
 def _process_files(mode: str, val: list, train: list, save_dir: str):
     """Copy (and rename) src file from root_dir to save_dir"""
     assert mode in ["junctions", "grains", "all"], "Invalid mode"
