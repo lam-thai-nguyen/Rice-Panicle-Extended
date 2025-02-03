@@ -136,7 +136,7 @@ def compute_f1_score(img_path, label_path, checkpoint, conf, iou_threshold) -> t
     #                                                                                                                           #
     #   Motivation (Idea explanation):                                                                                          #
     #       - We create a matrix of IoU between the *detected* and *true* junctions.                                            #
-    #       - We count up the TP by 1 if argmax(*detected*) is true and argmax(*true*) is *detected*                            #
+    #       - We count up the TP by 1 if argmax(*detected*) is *true* and argmax(*true*) is *detected*                          #
     #           (because sometimes multiple detections can have high IoU with the same *true* box)                              #
     #       - *Detected* bounding boxes whose IoU with a matched *true* box is high but couldn't find a match is counted as FP  #
     # ========================================================================================================================= #
