@@ -4,6 +4,7 @@ import seaborn as sns
 
 
 def save_f1_score(xlsx_file, save_path):
+    """Save f1 score as a plot"""
     # Read the xlsx file and get the columns
     df = pd.read_excel(xlsx_file)
     df.columns = df.columns.str.strip()
