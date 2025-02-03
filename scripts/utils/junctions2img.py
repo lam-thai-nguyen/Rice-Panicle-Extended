@@ -31,7 +31,7 @@ if __name__ == "__main__":
     processed_african_path = processed_path + "/African"
     processed_asian_path = processed_path + "/Asian"
     
-    save_path = "test"  # Change this if needed
+    BUFFER_PATH = "buffer"  # Change this if needed
     
     # =============================== #
     #      Comment out if needed      #
@@ -45,11 +45,12 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=26,  # Change this if needed
-                save_path="data/annotations/African/oriented",  # Change this if needed
+                bbox_size=22,  # Change this if needed
+                save_path=BUFFER_PATH,  # Change this if needed
                 skeleton_based=False,
                 oriented_method=0,
             )
+            print()
             break  # Comment out if needed
     
     for original_img in os.listdir(asian_path):
@@ -60,10 +61,11 @@ if __name__ == "__main__":
             junctions2img(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=26,  # Change this if needed
-                save_path="data/annotations/Asian/oriented",  # Change this if needed
+                bbox_size=22,  # Change this if needed
+                save_path=BUFFER_PATH,  # Change this if needed
                 skeleton_based=False,
                 oriented_method=0,
             )
+            print()
             break  # Comment out if needed
             

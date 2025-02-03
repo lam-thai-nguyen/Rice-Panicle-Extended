@@ -33,7 +33,7 @@ if __name__ == "__main__":
     processed_african_path = processed_path + "/African"
     processed_asian_path = processed_path + "/Asian"
     
-    save_path = "test"  # Change this if needed
+    BUFFER_PATH = "buffer"
     
     # =============================== #
     #      Comment out if needed      #
@@ -47,11 +47,12 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=30,
-                save_path_txt=save_path,
+                bbox_size=22,
+                save_path_txt=BUFFER_PATH,
                 skeleton_based=False,
-                oriented_method=2,
+                oriented_method=0,
             )
+            print()
             break  # Change this if needed
     
     for original_img in os.listdir(asian_path):
@@ -62,10 +63,11 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=30,
-                save_path_txt=save_path,
+                bbox_size=22,
+                save_path_txt=BUFFER_PATH,
                 skeleton_based=False,
-                oriented_method=2,
+                oriented_method=0,
             )
+            print()
             break  # Change this if needed
             

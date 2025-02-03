@@ -17,7 +17,6 @@ class AnnotationsGenerator:
             img_path (str): original image path
             ricepr_path (str): .ricepr file path
         """
-        assert img_path.split("/")[-1].split(".")[-1].lower() == "jpg", "The given path is not an image"
         assert ricepr_path.split("/")[-1].split(".")[-1].lower() == "ricepr", "The given path is not a .ricepr file"
         assert img_path.split("/")[-1].split(".")[0] == ricepr_path.split("/")[-1].split(".")[0], "Unmatched image and .ricepr file"
         
