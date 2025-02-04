@@ -47,10 +47,10 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=22,
+                bbox_size=62,  # Change this as desired
                 save_path_txt=BUFFER_PATH,
-                skeleton_based=False,
-                oriented_method=0,
+                skeleton_based=False,  # Change this as desired
+                oriented_method=0,  # Change this as desired
             )
             print()
             break  # Change this if needed
@@ -63,10 +63,10 @@ if __name__ == "__main__":
             junctions2txt(
                 img_path=img_path,
                 ricepr_path=ricepr_path,
-                bbox_size=22,
+                bbox_size=62,  # Change this as desired
                 save_path_txt=BUFFER_PATH,
-                skeleton_based=False,
-                oriented_method=0,
+                skeleton_based=False,  # Change this as desired
+                oriented_method=0,  # Change this as desired
             )
             print()
             break  # Change this if needed
