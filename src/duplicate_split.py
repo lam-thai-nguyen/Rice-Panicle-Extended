@@ -54,6 +54,6 @@ def duplicate_split(src, dst):
         
         
 if __name__ == "__main__":
-    src = "split0"  # Change this if needed
-    dst = "split1"  # Change this if needed
+    src = "split1"  # Change this if needed
+    dst = "split11"  # Change this if needed
     duplicate_split(src, dst)
