@@ -46,9 +46,9 @@ if __name__ == "__main__":
                 img_path=img_path,
                 ricepr_path=ricepr_path,
                 bbox_size=22,  # Change this if needed
-                save_path=BUFFER_PATH,  # Change this if needed
-                skeleton_based=False,
-                oriented_method=0,
+                save_path=BUFFER_PATH,
+                skeleton_based=False,  # Change this if needed
+                oriented_method=1,  # Change this if needed
             )
             print()
             break  # Comment out if needed
@@ -62,9 +62,9 @@ if __name__ == "__main__":
                 img_path=img_path,
                 ricepr_path=ricepr_path,
                 bbox_size=22,  # Change this if needed
-                save_path=BUFFER_PATH,  # Change this if needed
-                skeleton_based=False,
-                oriented_method=0,
+                save_path=BUFFER_PATH,
+                skeleton_based=False,  # Change this if needed
+                oriented_method=0,  # Change this if needed
             )
             print()
             break  # Comment out if needed
