@@ -36,9 +36,10 @@ class OrientedBox:
             x1, y1 = pt1
             x2, y2 = pt2
             
-            # angle_rad in (-pi/2, pi/2], angle_deg in (-180, 180]
+            # N.B. To understand math.atan2, refer to this image: https://mazzo.li/assets/images/atan-quadrants.png
+            # N.B. math.atan2 draws a horizontal line crossing the first point (x1, y1), and then (i) for Cartesian, the returned angle goes counterclockwise from the horizontal line to the line connecting 2 points and (ii) for OpenCV (inverted y-axis), the returned angle goes clockwise from the horizontal line to the line connecting 2 points.
+            # angle_rad in (-pi, pi], angle_deg in (-180, 180]
             # This angle is counterclockwise in Cartesian system, clockwise in OpenCV.
-            # Visually, we compute the clockwise rotating angle here.
             angle_rad = math.atan2(y2-y1, x2-x1)
             angle_deg = math.degrees(angle_rad)
             
