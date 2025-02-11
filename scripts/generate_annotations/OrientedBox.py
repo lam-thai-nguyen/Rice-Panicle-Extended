@@ -43,15 +43,10 @@ class OrientedBox:
             angle_rad = math.atan2(y2-y1, x2-x1)
             angle_deg = math.degrees(angle_rad)
             
-            # Disregard vector orientation to make sure angle_deg falls in [0., 180.]
-            if angle_deg < 0:
-                angle_deg += 180.
-            
             # Theta is the counterclockwise angle in Cartesian system, clockwise in OpenCV.
-            # As the box vertex lies on the connecting line, we subtract 45. from theta to get the rotating angle
             if method == 1:
                 angle_diagonal = 45.
-                theta = angle_deg - angle_diagonal
+                theta = angle_deg - angle_diagonal  # theta in (-225, 135)
             elif method == 2:
                 theta = angle_deg
                 
