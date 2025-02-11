@@ -36,11 +36,13 @@ class AnnotationsGenerator:
             show (bool): Show the generated image? Default to False.
             skeleton_based (bool): Use the junctions from the APSIPA pipeline. Default to False.
             oriented_method = {0, 1, 2}
-                0: horizontal box
-                1: oriented 1 (refer to ./OrientedBox.py)
-                2: oriented 2 (refer to ./OrientedBox.py)
+                0: HBB
+                1: OBBv1
+                2: OBBv2
             save_path_txt: Specify if you want to ENCODE and save to .txt file. Default to None.
         """
+        assert oriented_method in [0, 1, 2], "Invalid oriented_method"
+        
         junctions = self.junctions.return_junctions()
         boxes = list()
         
