@@ -65,7 +65,7 @@ class AnnotationsGenerator:
 
         if oriented_method:
             oriented_box = OrientedBox(junctions)
-            rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)  # rects = [(center, (width, height), angle), ...]
+            rects = oriented_box.run(width=bbox_size, height=bbox_size, method=oriented_method)  # rects = [(center, (width, height), angle)]
             boxes = rects
             
             for rect in rects:
@@ -75,7 +75,7 @@ class AnnotationsGenerator:
             
         else:
             horizontal_box = HorizontalBox(junctions)
-            rects = horizontal_box.run_junctions(width=bbox_size, height=bbox_size)  # rects = [(pt1, pt2), ...]
+            rects = horizontal_box.run_junctions(width=bbox_size, height=bbox_size)  # rects = [(pt1, pt2)]
             boxes = junctions
             for pt1, pt2 in rects:
                 cv2.rectangle(img_copy, pt1, pt2, (0, 255, 255), 2)
@@ -126,24 +126,26 @@ class AnnotationsGenerator:
             xyxyxyxy = list()
 
             for xywhr in boxes:
-                obb = cv2.boxPoints(xywhr)  # 4 corner coords (clockwise starting with leftmost corner)
-                obb = obb.tolist()
+                obb = cv2.boxPoints(xywhr)  # 4 corner coords
 
-                (x1, y1), (x4, y4) = obb[1], obb[0]
+                # Extract the four corner coordinates of the box
+                x1, y1 = obb[np.argmin(obb[:, 1])].tolist()  # topmost in inverted y-axis: lowest y
+                x2, y2 = obb[np.argmax(obb[:, 0])].tolist()  # rightmost in inverted y-axis: highest x
+                x3, y3 = obb[np.argmax(obb[:, 1])].tolist()  # bottommost in inverted y-axis: highest y
+                x4, y4 = obb[np.argmin(obb[:, 0])].tolist()  # leftmost in inverted y-axis: lowest x
+
+                # Compute l1, l2
                 l1 = x1 - x4
                 l2 = y4 - y1
                 
                 if l1 <= l2:
-                    # Change the order of obb: starting from topmost corner
-                    obb = obb[1:] + obb[0:1]
+                    # Encoding starts from (x1, y1)
+                    obb_encoded = tuple([x1, y1, x2, y2, x3, y3, x4, y4])
                 else:
-                    # Keep the order: starting from leftmost
-                    pass
+                    # Encoding starts from (x4, y4)
+                    obb_encoded = tuple([x4, y4, x1, y1, x2, y2, x3, y3])
                 
-                # Flatten the representation
-                obb = [coord for coords in obb for coord in coords]
-                
-                xyxyxyxy.append(tuple(obb))
+                xyxyxyxy.append(obb_encoded)
 
             return xyxyxyxy
             
