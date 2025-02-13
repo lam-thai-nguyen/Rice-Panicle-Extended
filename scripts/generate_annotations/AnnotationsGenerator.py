@@ -1,4 +1,5 @@
 import os
+import math
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -279,6 +280,52 @@ class AnnotationsGenerator:
         
         if save_path:
             cv2.imwrite(f"{save_path}/{self.name}_vertex_edge.jpg", img)
+
+    def generate_junction_distance(self, save_path=None, return_distance=False) -> None:
+        """draw the junction distance from .ricepr file to the image, mainly for visualizing purposes"""
+        img = self.img.copy()
+        terminals = self.junctions.return_terminal()
+        primary = self.junctions.return_primary()
+        secondary = self.junctions.return_secondary()
+        tertiary = self.junctions.return_tertiary()
+        generating = self.junctions.return_generating()
+        edges = self.edges
+        
+        junction_distance = list()
+        
+        for edge in edges:
+            x1, y1, x2, y2 = edge
+            if (x2, y2) in terminals or (x2, y2) in primary or (x2, y2) in generating:
+                continue
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 255), 2)
+            dist = math.dist((x1, y1), (x2, y2))
+            junction_distance.append(dist)
+
+        for terminal in terminals:
+            x, y = terminal
+            cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+
+        for junction in primary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 255, 255), -1)
+
+        for junction in secondary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
+
+        for junction in tertiary:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (0, 255, 0), -1)
+
+        for junction in generating:
+            x, y = junction
+            cv2.circle(img, (x, y), 5, (255, 255, 0), -1)
+        
+        if save_path:
+            cv2.imwrite(f"{save_path}/{self.name}_junction_distance.jpg", img)
+            
+        if return_distance:
+            return junction_distance
 
     def _show(self, img):
         """util function"""
