@@ -40,8 +40,10 @@ confidence: # [train conf, val conf]
   split9: [0.341, 0.319]
   split10: [0.304, 0.304]
   split11: [0.421, 0.414] # hbb size 62
-  split12: [0.331, 0.315]
-  split13: [0.374, 0.374]
+  split12: [0.331, 0.315] # hbb size 66
+  split13: [0.374, 0.374] # hbb size 70
+  split14: [0.368, 0.350] # hbb size 74
+  split15: [0.234, 0.234] # hbb size 78
 
 benchmark_image:
   lots_of_problems: "Asian/43_2_1_1_2_DSC09658_.jpg"
