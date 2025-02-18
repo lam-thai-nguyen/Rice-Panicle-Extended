@@ -6,10 +6,10 @@ from scripts.generate_annotations.AnnotationsGenerator import AnnotationsGenerat
 import matplotlib.pyplot as plt
 
 
-def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False):
+def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, percentile: int = None, mu_std=False, tallest_bin=False):
     """
     Compute the distance between junctions and returns a histogram (optional)
-    the distance between junctions exclude: (1) distance from one junction to primary, (2) distance from one junction to generating and (3) distance from one junction to end point
+    the distance between junctions excludes the distance from one junction to end point
 
     Args:
         root_img_dir (str): The root image directory, consisting of African/ and Asian/
@@ -68,24 +68,47 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False):
         num_bins = int(2 * len(buffer) ** (1/3))  # rice rule
         n, bins, patches = plt.hist(buffer, bins=num_bins, color='skyblue', edgecolor='black')
         
-        # Find the tallest bin
-        max_bin_index = np.argmax(n)  # Index of the tallest bin
-        max_bin_height = n[max_bin_index]  # Height (count) of the tallest bin
-        max_bin_range = (bins[max_bin_index], bins[max_bin_index + 1])  # Bin edges
-        print(f"==>> max_bin_range: {max_bin_range}")
+        
+        # Highlight the Q1 on the histogram
+        if percentile:
+            # Compute the percentile
+            percentile_value = np.percentile(buffer, percentile)
+            
+            # Plot
+            plt.axvline(percentile_value, color='blue', label=f'${percentile}$th percentile = {percentile_value:.2f}')
+        
+        # Highlight the mean and STD on the histogram
+        if mu_std:
+            # Compute the mean and standard deviation of the buffer
+            mu = np.mean(buffer)
+            sigma = np.std(buffer)
+            print(f"==>> sigma: {sigma}")
+            
+            # Plot
+            plt.axvline(mu, color='red', label=f'$\mu$ = {mu:.2f}')
+            plt.axvline(mu - sigma, color='blue', label=f'$\mu-1\sigma$ = {mu - sigma:.2f}')
+        
 
         # Highlight tallest bin
-        patches[max_bin_index].set_facecolor('red')
+        if tallest_bin:
+            # Find the tallest bin
+            max_bin_index = np.argmax(n)  # Index of the tallest bin
+            max_bin_height = n[max_bin_index]  # Height (count) of the tallest bin
+            max_bin_range = (bins[max_bin_index], bins[max_bin_index + 1])  # Bin edges
+            
+            # Plot
+            patches[max_bin_index].set_facecolor('red')
 
-        # Annotate the bin range
-        plt.text((max_bin_range[0] + max_bin_range[1]) / 2, max_bin_height, 
-                f"{max_bin_range[0]:.2f} - {max_bin_range[1]:.2f}", 
-                ha='center', va='bottom', fontsize=10, color='red', fontweight='medium')
+            # Annotate the bin range
+            plt.text((max_bin_range[0] + max_bin_range[1]) / 2, max_bin_height, 
+                    f"{max_bin_range[0]:.2f} - {max_bin_range[1]:.2f}", 
+                    ha='center', va='bottom', fontsize=10, color='red', fontweight='medium')
 
         # Labels and title
-        plt.xlabel("Non-overlapping junction distance in pixels.")
+        plt.xlabel("Edge length in pixels.")
         plt.ylabel("Frequency")
-        plt.title("Histogram of non-overlapping junction distance over 560 rice panicle images.")
+        plt.title("Histogram of edge lengths over 560 rice panicle images.")
+        plt.legend()
         plt.show()
     
     
@@ -93,5 +116,8 @@ if __name__ == "__main__":
     compute_junction_distance(
         root_img_dir="data/raw",
         root_ricepr_dir="data/processed",
-        histogram=True
+        histogram=True,
+        percentile=20,
+        mu_std=True,
+        tallest_bin=False
     )
