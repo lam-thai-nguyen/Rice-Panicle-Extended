@@ -295,7 +295,7 @@ class AnnotationsGenerator:
         
         for edge in edges:
             x1, y1, x2, y2 = edge
-            if (x2, y2) in terminals or (x2, y2) in primary or (x2, y2) in generating:
+            if (x2, y2) in terminals:
                 continue
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 255), 2)
             dist = math.dist((x1, y1), (x2, y2))
