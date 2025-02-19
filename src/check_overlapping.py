@@ -188,8 +188,8 @@ def show_annotated_images(image_name, bbox_size) -> None:
 
 if __name__ == "__main__":
     # Check overlapping degree at every bounding box size, which is determined by the split name
-    SPLIT_INDEX = range(1, 16, 2)  # Change this as needed
-    MIN_SIZE, MAX_SIZE, STEP = 22, 78, 8  # Change this as needed
+    SPLIT_INDEX = range(1, 16, 1)  # Change this as needed
+    MIN_SIZE, MAX_SIZE, STEP = 22, 78, 4  # Change this as needed
     PERCENTAGE = 20  # Change this if needed
     history = list()
 
@@ -207,8 +207,8 @@ if __name__ == "__main__":
     # Plot history
     plt.figure(figsize=(8, 6))
     x_values = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
-    plt.scatter(x_values, history, c="red", label="Data Points", zorder=2)
-    plt.plot(x_values, history, label="Trend Line", zorder=1)
+    plt.scatter(x_values, history, c="red", zorder=2)
+    plt.plot(x_values, history, zorder=1)
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
     plt.xlabel("Bounding box size (pixels)")
     plt.ylabel("Overlapping Degree (%)")
