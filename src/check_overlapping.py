@@ -188,9 +188,11 @@ def show_annotated_images(image_name, bbox_size) -> None:
 
 if __name__ == "__main__":
     # Check overlapping degree at every bounding box size, which is determined by the split name
-    SPLIT_INDEX = range(1, 16, 1)  # Change this as needed
-    MIN_SIZE, MAX_SIZE, STEP = 22, 78, 4  # Change this as needed
+    NUM_SPLITS, SPLIT_STEP = 19, 2  # Change this as needed
+    MIN_SIZE, MAX_SIZE, STEP = 22, 94, 8  # Change this as needed
     PERCENTAGE = 20  # Change this if needed
+
+    SPLIT_INDEX = range(1, NUM_SPLITS+1, SPLIT_STEP)
     history = list()
 
     for i in SPLIT_INDEX:
@@ -214,6 +216,27 @@ if __name__ == "__main__":
     plt.ylabel("Overlapping Degree (%)")
     plt.title("Overlapping degree of bounding boxes based on their size")
     plt.show()
+    
+    
+    # delta_p = np.diff(history)
+    # # delta2_p = np.diff(delta_p)
+    # # relative_drop = delta_p / history[:-1]
+
+    # first_order_diff = delta_p
+    # # second_order_diff = delta2_p
+    # # relative_drop_values = relative_drop
+
+    # plt.figure(figsize=(10, 5))
+
+    # plt.plot(x_values[1:], first_order_diff, label='First-Order Difference', marker='o')
+    # # plt.plot(x_values[2:], second_order_diff, label='Second-Order Difference', marker='s')
+    # # plt.plot(x_values[1:], relative_drop_values, label='Relative Drop', marker='^')
+
+    # plt.xlabel('Bounding box size')
+    # plt.ylabel('Difference (%)')
+    # plt.legend()
+    # plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
+    # plt.show()
     
     # For debugging purposes
     # show_annotated_images(

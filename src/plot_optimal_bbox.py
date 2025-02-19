@@ -14,8 +14,11 @@ def plot_optimal_bbox(train=True, val=True):
         val (bool, optional): whether or not to show validation metrics. Defaults to True.
     """
     # Data
-    bbox_sizes = list(range(22, 82+1, 4))
-    split_names = [f"split{n}" for n in range(1, 16+1)]
+    MIN_SIZE, MAX_SIZE, STEP = 22, 94, 4  # Change if needed
+    NUM_SPLITS = 19  # Change if needed
+    
+    bbox_sizes = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
+    split_names = [f"split{n}" for n in range(1, NUM_SPLITS+1)]
     
     f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = read_xlsx(split_names)
     assert len(bbox_sizes) == len(f1_train), "Unmatched list lengths"
@@ -23,9 +26,9 @@ def plot_optimal_bbox(train=True, val=True):
     if train and val:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
     elif train and not val:
-        fig, (ax1) = plt.subplots(1, 1, figsize=(8, 7))
+        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 7))
     elif not train and val:
-        fig, (ax2) = plt.subplots(1, 1, figsize=(8, 7))
+        fig, (ax2) = plt.subplots(1, 1, figsize=(10, 7))
     else:
         return
     
