@@ -32,18 +32,23 @@ confidence: # [train conf, val conf]
   split1: [0.334, 0.334] # hbb size 22
   split2: [0.352, 0.352] # hbb size 26
   split3: [0.347, 0.323] # hbb size 30
-  split4: [0.358, 0.358] # split3.size + 4
-  split5: [0.402, 0.402] # ...
-  split6: [0.392, 0.370]
-  split7: [0.307, 0.307]
-  split8: [0.359, 0.338]
-  split9: [0.341, 0.319]
-  split10: [0.304, 0.304]
+  split4: [0.358, 0.358] # hbb size 34
+  split5: [0.402, 0.402] # hbb size 38
+  split6: [0.392, 0.370] # hbb size 42
+  split7: [0.307, 0.307] # hbb size 46
+  split8: [0.359, 0.338] # hbb size 50
+  split9: [0.341, 0.319] # hbb size 54
+  split10: [0.304, 0.304] # hbb size 58
   split11: [0.421, 0.414] # hbb size 62
   split12: [0.331, 0.315] # hbb size 66
   split13: [0.374, 0.374] # hbb size 70
   split14: [0.368, 0.350] # hbb size 74
   split15: [0.234, 0.234] # hbb size 78
+  split16: [..., ...] # hbb size 82
+  split17: [..., ...] # hbb size 86
+  split18: [..., ...] # hbb size 90
+  split19: [..., ...] # hbb size 94
+  split20: [..., ...] # hbb size 98
 
 benchmark_image:
   lots_of_problems: "Asian/43_2_1_1_2_DSC09658_.jpg"
