@@ -23,7 +23,7 @@ def check_overlapping(split_path: str, percentage: float = 20) -> float:
 
     Args:
         split_path (str): It is expected to be data/splits/split?/
-        percentage (float, optional): It is recommended that the overlapping between stitched images falls within the range of 20% and 50% [1]. Defaults to 20.
+        percentage (float, optional): It is recommended that the overlapping threshold between stitched images falls within the range of 20% and 50% [1]. Defaults to 20.
 
     Returns:
         float: The overlapping degree in the range of [0%, 100%]
@@ -188,11 +188,11 @@ def show_annotated_images(image_name, bbox_size) -> None:
 
 if __name__ == "__main__":
     # Check overlapping degree at every bounding box size, which is determined by the split name
-    NUM_SPLITS, SPLIT_STEP = 19, 2  # Change this as needed
-    MIN_SIZE, MAX_SIZE, STEP = 22, 94, 8  # Change this as needed
+    NUM_SPLITS, SPLIT_STEP = 20, 2  # Change this as needed
+    MIN_SIZE, MAX_SIZE, STEP = 22, 98, 4 * SPLIT_STEP  # Change the first two as needed
     PERCENTAGE = 20  # Change this if needed
 
-    SPLIT_INDEX = range(1, NUM_SPLITS+1, SPLIT_STEP)
+    SPLIT_INDEX = list(range(1, NUM_SPLITS+1, SPLIT_STEP))
     history = list()
 
     for i in SPLIT_INDEX:
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     print(f"==>> History: {history}")
 
     # Plot history
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     x_values = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
     plt.scatter(x_values, history, c="red", zorder=2)
     plt.plot(x_values, history, zorder=1)
@@ -215,28 +215,27 @@ if __name__ == "__main__":
     plt.xlabel("Bounding box size (pixels)")
     plt.ylabel("Overlapping Degree (%)")
     plt.title("Overlapping degree of bounding boxes based on their size")
-    plt.show()
-    
-    
-    # delta_p = np.diff(history)
-    # # delta2_p = np.diff(delta_p)
-    # # relative_drop = delta_p / history[:-1]
-
-    # first_order_diff = delta_p
-    # # second_order_diff = delta2_p
-    # # relative_drop_values = relative_drop
-
-    # plt.figure(figsize=(10, 5))
-
-    # plt.plot(x_values[1:], first_order_diff, label='First-Order Difference', marker='o')
-    # # plt.plot(x_values[2:], second_order_diff, label='Second-Order Difference', marker='s')
-    # # plt.plot(x_values[1:], relative_drop_values, label='Relative Drop', marker='^')
-
-    # plt.xlabel('Bounding box size')
-    # plt.ylabel('Difference (%)')
-    # plt.legend()
-    # plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
     # plt.show()
+    
+    
+    # First derivative
+    plt.figure(figsize=(10, 5))
+    slopes = np.gradient(history, x_values)
+    plt.plot(x_values, slopes, label='First derivative', c='r', marker='o')
+    plt.xlabel('Bounding box size')
+    plt.legend()
+    plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
+
+    # Second derivative
+    plt.figure(figsize=(10, 5))
+    second_slopes = np.gradient(slopes, x_values)
+    plt.plot(x_values, second_slopes, label='Second derivative', c='r', marker='o')
+
+    plt.xlabel('Bounding box size')
+    plt.legend()
+    plt.axhline(y=0, color='black', linestyle=':', linewidth=1)
+    plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
+    plt.show()
     
     # For debugging purposes
     # show_annotated_images(
