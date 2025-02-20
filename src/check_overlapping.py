@@ -221,7 +221,8 @@ if __name__ == "__main__":
     # First derivative
     plt.figure(figsize=(10, 5))
     slopes = np.gradient(history, x_values)
-    plt.plot(x_values, slopes, label='First derivative', c='r', marker='o')
+    plt.scatter(x_values, slopes, c="red", zorder=2)
+    plt.plot(x_values, slopes, label='First derivative',zorder=1)
     plt.xlabel('Bounding box size')
     plt.legend()
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
@@ -229,7 +230,19 @@ if __name__ == "__main__":
     # Second derivative
     plt.figure(figsize=(10, 5))
     second_slopes = np.gradient(slopes, x_values)
-    plt.plot(x_values, second_slopes, label='Second derivative', c='r', marker='o')
+    plt.scatter(x_values, second_slopes, c="red", zorder=2)
+    plt.plot(x_values, second_slopes, label='Second derivative',zorder=1)
+
+    plt.xlabel('Bounding box size')
+    plt.legend()
+    plt.axhline(y=0, color='black', linestyle=':', linewidth=1)
+    plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
+
+    # Third derivative
+    plt.figure(figsize=(10, 5))
+    third_slopes = np.gradient(second_slopes, x_values)
+    plt.scatter(x_values, third_slopes, c="red", zorder=2)
+    plt.plot(x_values, third_slopes, label='Third derivative',zorder=1)
 
     plt.xlabel('Bounding box size')
     plt.legend()
