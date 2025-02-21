@@ -215,7 +215,6 @@ if __name__ == "__main__":
     plt.xlabel("Bounding box size (pixels)")
     plt.ylabel("Overlapping Degree (%)")
     plt.title("Overlapping degree of bounding boxes based on their size")
-    # plt.show()
     
     
     # First derivative
