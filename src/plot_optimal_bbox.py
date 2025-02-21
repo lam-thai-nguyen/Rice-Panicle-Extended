@@ -14,8 +14,8 @@ def plot_optimal_bbox(train=True, val=True):
         val (bool, optional): whether or not to show validation metrics. Defaults to True.
     """
     # Data
-    MIN_SIZE, MAX_SIZE, STEP = 22, 94, 4  # Change if needed
-    NUM_SPLITS = 19  # Change if needed
+    MIN_SIZE, MAX_SIZE, STEP = 22, 98, 4  # Change if needed
+    NUM_SPLITS = 20  # Change if needed
     
     bbox_sizes = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
     split_names = [f"split{n}" for n in range(1, NUM_SPLITS+1)]
