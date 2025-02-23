@@ -188,7 +188,7 @@ def show_annotated_images(image_name, bbox_size) -> None:
 
 if __name__ == "__main__":
     # Check overlapping degree at every bounding box size, which is determined by the split name
-    NUM_SPLITS, SPLIT_STEP = 20, 2  # Change this as needed
+    NUM_SPLITS, SPLIT_STEP = 20, 1  # Change this as needed
     MIN_SIZE, MAX_SIZE, STEP = 22, 98, 4 * SPLIT_STEP  # Change the first two as needed
     PERCENTAGE = 20  # Change this if needed
 
@@ -205,47 +205,52 @@ if __name__ == "__main__":
         history.append(overlapping_degree)
     
     print(f"==>> History: {history}")
+    
+    # Set global font size, marker size, and line width
+    plt.rcParams.update({
+        'font.size': 18,
+        'lines.linewidth': 4,
+        'lines.markersize': 10
+    })
 
     # Plot history
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 8))
     x_values = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
     plt.scatter(x_values, history, c="red", zorder=2)
     plt.plot(x_values, history, zorder=1)
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
     plt.xlabel("Bounding box size (pixels)")
     plt.ylabel("Overlapping Degree (%)")
-    plt.title("Overlapping degree of bounding boxes based on their size")
-    
     
     # First derivative
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(12, 8))
     slopes = np.gradient(history, x_values)
     plt.scatter(x_values, slopes, c="red", zorder=2)
     plt.plot(x_values, slopes, label='First derivative',zorder=1)
-    plt.xlabel('Bounding box size')
-    plt.legend()
+    plt.xlabel('Bounding box size (pixels)')
+    # plt.legend()
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
 
     # Second derivative
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(12, 8))
     second_slopes = np.gradient(slopes, x_values)
     plt.scatter(x_values, second_slopes, c="red", zorder=2)
     plt.plot(x_values, second_slopes, label='Second derivative',zorder=1)
 
-    plt.xlabel('Bounding box size')
-    plt.legend()
-    plt.axhline(y=0, color='black', linestyle=':', linewidth=1)
+    plt.xlabel('Bounding box size (pixels)')
+    # plt.legend()
+    plt.axhline(y=0, color='black', linestyle=':', linewidth=5)
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
 
     # Third derivative
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(12, 8))
     third_slopes = np.gradient(second_slopes, x_values)
     plt.scatter(x_values, third_slopes, c="red", zorder=2)
     plt.plot(x_values, third_slopes, label='Third derivative',zorder=1)
 
-    plt.xlabel('Bounding box size')
-    plt.legend()
-    plt.axhline(y=0, color='black', linestyle=':', linewidth=1)
+    plt.xlabel('Bounding box size (pixels)')
+    # plt.legend()
+    plt.axhline(y=0, color='black', linestyle=':', linewidth=5)
     plt.xticks(np.arange(MIN_SIZE, MAX_SIZE + 1, STEP))
     plt.show()
     
