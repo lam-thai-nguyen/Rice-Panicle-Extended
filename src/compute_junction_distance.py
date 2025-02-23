@@ -64,7 +64,7 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
     # Set global font size, marker size, and line width
     plt.rcParams.update({
         'font.size': 18,
-        'lines.linewidth': 4,
+        'lines.linewidth': 2,
         'lines.markersize': 10
     })
     
@@ -89,11 +89,10 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
             # Compute the mean and standard deviation of the buffer
             mu = np.mean(buffer)
             sigma = np.std(buffer)
-            print(f"==>> sigma: {sigma}")
             
             # Plot
             plt.axvline(mu, color='red', label=f'$\mu$ = {mu:.2f}')
-            plt.axvline(mu - sigma, color='blue', label=f'$\mu-1\sigma$ = {mu - sigma:.2f}')
+            plt.axvspan(mu - sigma, mu + sigma, color='blue', alpha=0.2, label=rf'$\mu \mp 1\sigma = [{mu-sigma:.2f}, {mu+sigma:.2f}]$')
         
 
         # Highlight tallest bin
@@ -112,9 +111,8 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
                     ha='center', va='bottom', fontsize=14, color='red', fontweight='bold')
 
         # Labels and title
-        plt.xlabel("Edge length in pixels.")
+        plt.xlabel("Edge length (pixels)")
         plt.ylabel("Frequency")
-        # plt.title("Histogram of edge lengths over 560 rice panicle images.")
         plt.legend()
         plt.show()
     
@@ -126,5 +124,5 @@ if __name__ == "__main__":
         histogram=True,
         percentile=None,
         mu_std=True,
-        tallest_bin=True
+        tallest_bin=False
     )
