@@ -61,9 +61,16 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
         
     print(f"==>> We have {len(buffer)} junction distance values.")
 
+    # Set global font size, marker size, and line width
+    plt.rcParams.update({
+        'font.size': 18,
+        'lines.linewidth': 4,
+        'lines.markersize': 10
+    })
+    
     # Plot histogram
     if histogram:
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(10, 8))
         
         num_bins = int(2 * len(buffer) ** (1/3))  # rice rule
         n, bins, patches = plt.hist(buffer, bins=num_bins, color='skyblue', edgecolor='black')
@@ -102,12 +109,12 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
             # Annotate the bin range
             plt.text((max_bin_range[0] + max_bin_range[1]) / 2, max_bin_height, 
                     f"{max_bin_range[0]:.2f} - {max_bin_range[1]:.2f}", 
-                    ha='center', va='bottom', fontsize=10, color='red', fontweight='medium')
+                    ha='center', va='bottom', fontsize=14, color='red', fontweight='bold')
 
         # Labels and title
         plt.xlabel("Edge length in pixels.")
         plt.ylabel("Frequency")
-        plt.title("Histogram of edge lengths over 560 rice panicle images.")
+        # plt.title("Histogram of edge lengths over 560 rice panicle images.")
         plt.legend()
         plt.show()
     
@@ -117,7 +124,7 @@ if __name__ == "__main__":
         root_img_dir="data/raw",
         root_ricepr_dir="data/processed",
         histogram=True,
-        percentile=20,
+        percentile=None,
         mu_std=True,
-        tallest_bin=False
+        tallest_bin=True
     )
