@@ -6,7 +6,7 @@ from scripts.generate_annotations.AnnotationsGenerator import AnnotationsGenerat
 import matplotlib.pyplot as plt
 
 
-def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, percentile: int = None, mu_std=False, tallest_bin=False):
+def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, percentile: int = None, mu_std=False, median_absolute_dev=None, tallest_bin=False, distance_threshold=None):
     """
     Compute the distance between junctions and returns a histogram (optional)
     the distance between junctions excludes the distance from one junction to end point
@@ -15,6 +15,7 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
         root_img_dir (str): The root image directory, consisting of African/ and Asian/
         root_ricepr_dir (str): The root ricepr directory, consisting of African/ and Asian/
         histogram (bool, optional): Defaults to False.
+        distance_threshold (tuple, optional): Removing any junction distance beyond this threshold
     """
     # Create a buffer to store all distance
     buffer = list()
@@ -36,6 +37,10 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
         # Get junction distance
         junction_distance = gen.generate_junction_distance(return_distance=True)
         
+        # Apply threshold
+        if distance_threshold:
+            junction_distance = [distance for distance in junction_distance if distance_threshold[0] <= distance <= distance_threshold[1]]
+        
         # Add to the buffer
         buffer += junction_distance
     
@@ -56,6 +61,10 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
         # Get junction distance
         junction_distance = gen.generate_junction_distance(return_distance=True)
         
+        # Apply threshold
+        if distance_threshold:
+            junction_distance = [distance for distance in junction_distance if distance_threshold[0] <= distance <= distance_threshold[1]]
+
         # Add to the buffer
         buffer += junction_distance
         
@@ -93,7 +102,22 @@ def compute_junction_distance(root_img_dir, root_ricepr_dir, histogram=False, pe
             # Plot
             plt.axvline(mu, color='red', label=f'$\mu$ = {mu:.2f}')
             plt.axvspan(mu - sigma, mu + sigma, color='blue', alpha=0.2, label=rf'$\mu \mp 1\sigma = [{mu-sigma:.2f}, {mu+sigma:.2f}]$')
+            plt.axvspan(mu - 2*sigma, mu + 2*sigma, color='green', alpha=0.2, label=rf'$\mu \mp 2\sigma = [{mu-2*sigma:.2f}, {mu+2*sigma:.2f}]$')
         
+        # Highlight the Median Absolute Deviation (MAD)
+        if median_absolute_dev:
+            # Step 1: Compute the Median
+            median = np.median(buffer)
+            # Step 2: Compute Absolute Deviations from the Median
+            abs_deviations = np.abs(buffer - median)
+            # Step 3: Compute the Median of Absolute Deviations (MAD)
+            mad = np.median(abs_deviations)
+            # Step 4: Define Outlier Thresholds
+            lower_bound = median - (2 * mad)
+            upper_bound = median + (2 * mad)
+            # Plot
+            plt.axvline(median, color='red', label=rf'$\tilde{{x}}$ = {median:.2f}')
+            plt.axvspan(lower_bound, upper_bound, color='blue', alpha=0.2, label=rf'$\tilde{{x}} \mp 2MAD = [{lower_bound:.2f}, {upper_bound:.2f}]$')
 
         # Highlight tallest bin
         if tallest_bin:
@@ -123,6 +147,8 @@ if __name__ == "__main__":
         root_ricepr_dir="data/processed",
         histogram=True,
         percentile=None,
-        mu_std=True,
-        tallest_bin=False
+        mu_std=False,
+        median_absolute_dev=True,
+        tallest_bin=False,
+        distance_threshold=(11, 25)
     )
