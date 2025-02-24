@@ -14,8 +14,8 @@ def plot_optimal_bbox(train=True, val=True):
         val (bool, optional): whether or not to show validation metrics. Defaults to True.
     """
     # Data
-    MIN_SIZE, MAX_SIZE, STEP = 22, 98, 4  # Change if needed
-    NUM_SPLITS = 20  # Change if needed
+    MIN_SIZE, MAX_SIZE, STEP = 22, 46, 4  # Change if needed
+    NUM_SPLITS = 7  # Change if needed
     
     bbox_sizes = list(range(MIN_SIZE, MAX_SIZE+1, STEP))
     split_names = [f"split{n}" for n in range(1, NUM_SPLITS+1)]
@@ -23,65 +23,63 @@ def plot_optimal_bbox(train=True, val=True):
     f1_train, pr_train, rc_train, f1_val, pr_val, rc_val = read_xlsx(split_names)
     assert len(bbox_sizes) == len(f1_train), "Unmatched list lengths"
 
-    if train and val:
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
-    elif train and not val:
-        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 7))
-    elif not train and val:
-        fig, (ax2) = plt.subplots(1, 1, figsize=(10, 7))
-    else:
-        return
+    # Set global font size, marker size, and line width
+    plt.rcParams.update({
+        'font.size': 18,
+        'lines.linewidth': 2,
+        'lines.markersize': 10
+    })
     
-
+    
     # Plot training metrics
     if train:
-        ax1.plot(bbox_sizes, pr_train, label="Precision", marker='o', markersize=8, c='#009E73')
-        ax1.plot(bbox_sizes, f1_train, label="$F_1$ score", marker='o', markersize=8, c='#E69F00')
-        ax1.plot(bbox_sizes, rc_train, label="Recall", marker='o', markersize=8, c='#0072B2')
+        plt.figure(figsize=(12, 8))
+        plt.plot(bbox_sizes, pr_train, label="Precision", marker='o', c='#009E73')
+        plt.plot(bbox_sizes, f1_train, label="$F_1$ score", marker='o', c='#E69F00')
+        plt.plot(bbox_sizes, rc_train, label="Recall", marker='o', c='#0072B2')
     
 
         # Add annotations for training metrics
         for i, txt in enumerate(f1_train):
-            ax1.annotate(f'{txt:.4f}', (bbox_sizes[i], f1_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], f1_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
         for i, txt in enumerate(pr_train):
-            ax1.annotate(f'{txt:.4f}', (bbox_sizes[i], pr_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], pr_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
         for i, txt in enumerate(rc_train):
-            ax1.annotate(f'{txt:.4f}', (bbox_sizes[i], rc_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], rc_train[i]), textcoords="offset points", xytext=(0,10), ha='center')
 
-        ax1.set_xlim(bbox_sizes[0]-2, bbox_sizes[-1]+2)
-        ax1.set_xticks(range(bbox_sizes[0], bbox_sizes[-1]+1, 4))
-        # ax1.set_ylim(0.8, 1.0)
-        ax1.set_yticks([])
-        ax1.set_xlabel("Bounding box size")
-        ax1.grid(True, linestyle="-")
-        ax1.set_title("Bounding box sizes comparison on training metrics")
-        ax1.legend()
+        plt.xlim(bbox_sizes[0]-2, bbox_sizes[-1]+2)
+        plt.xticks(range(bbox_sizes[0], bbox_sizes[-1]+1, 4))
+        plt.yticks([])
+        plt.xlabel("Bounding box size (pixels)", fontsize=18)
+        plt.grid(True, linestyle="-")
+        # ax1.title("Bounding box sizes comparison on training metrics")
+        plt.legend()
+        plt.show()
 
     # Plot validation metrics
     if val:
-        ax2.plot(bbox_sizes, pr_val, label="Precision", marker='o', markersize=8, c='#009E73')
-        ax2.plot(bbox_sizes, f1_val, label="$F_1$ score", marker='o', markersize=8, c='#E69F00')
-        ax2.plot(bbox_sizes, rc_val, label="Recall", marker='o', markersize=8, c='#0072B2')
+        plt.figure(figsize=(12, 8))
+        plt.plot(bbox_sizes, pr_val, label="Precision", marker='o', c='#009E73')
+        plt.plot(bbox_sizes, f1_val, label="$F_1$ score", marker='o', c='#E69F00')
+        plt.plot(bbox_sizes, rc_val, label="Recall", marker='o', c='#0072B2')
 
         # Add annotations for validation metrics
         for i, txt in enumerate(f1_val):
-            ax2.annotate(f'{txt:.4f}', (bbox_sizes[i], f1_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], f1_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
         for i, txt in enumerate(pr_val):
-            ax2.annotate(f'{txt:.4f}', (bbox_sizes[i], pr_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], pr_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
         for i, txt in enumerate(rc_val):
-            ax2.annotate(f'{txt:.4f}', (bbox_sizes[i], rc_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
+            plt.annotate(f'{txt:.4f}', (bbox_sizes[i], rc_val[i]), textcoords="offset points", xytext=(0,10), ha='center')
 
-        ax2.set_xlim(bbox_sizes[0]-2, bbox_sizes[-1]+2)
-        ax2.set_xticks(range(bbox_sizes[0], bbox_sizes[-1]+1, 4))
-        # ax2.set_ylim(0.8, 1.0)
-        ax2.set_yticks([])
-        ax2.set_xlabel("Bounding box size")
-        ax2.grid(True, linestyle="-")
-        ax2.set_title("Bounding box sizes comparison on evaluation metrics")
-        ax2.legend()
+        plt.xlim(bbox_sizes[0]-2, bbox_sizes[-1]+2)
+        plt.xticks(range(bbox_sizes[0], bbox_sizes[-1]+1, 4))
+        plt.yticks([])
+        plt.xlabel("Bounding box size (pixels)", fontsize=18)
+        plt.grid(True, linestyle="-")
+        # plt.title("Bounding box sizes comparison on evaluation metrics")
+        plt.legend()
+        plt.show()
 
-    plt.tight_layout()
-    plt.show()
 
 
 def read_xlsx(split_names: list):
@@ -120,9 +118,9 @@ def plot_fixed_bbox_comparison(fixed_bbox_size: int):
     # Define x-axis positions for each subject
     x_values = range(len(bbox_versions))
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+    fig, (ax1, plt) = plt.subplots(1, 2, figsize=(16, 8))
     ax1.set_title("Training metrics")
-    ax2.set_title("Evaluation metrics")
+    plt.set_title("Evaluation metrics")
 
     def subplot_metrics(ax, f1, pr, rc):
         for i, (f1, pr, rc) in enumerate(zip(f1, pr, rc)):
@@ -148,7 +146,7 @@ def plot_fixed_bbox_comparison(fixed_bbox_size: int):
         ax.grid(True, linestyle="--")
         
     subplot_metrics(ax1, f1_train, pr_train, rc_train)
-    subplot_metrics(ax2, f1_val, pr_val, rc_val)
+    subplot_metrics(plt, f1_val, pr_val, rc_val)
 
     fig.suptitle(f"Comparison of Metrics for HBB, OBBv1, OBBv2 at BB Size {fixed_bbox_size}")
     fig.legend(metric_labels, title="Metrics")
@@ -157,5 +155,5 @@ def plot_fixed_bbox_comparison(fixed_bbox_size: int):
 
 
 if __name__ == "__main__":
-    plot_optimal_bbox(train=False, val=True)
+    plot_optimal_bbox(train=True, val=True)
     
